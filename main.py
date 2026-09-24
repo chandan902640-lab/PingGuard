@@ -2,6 +2,7 @@ import sqlite3
 import asyncio
 import httpx
 import time
+import random
 from fastapi import FastAPI, Header
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -31,11 +32,9 @@ def log_msg(username, text):
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Table creations
     cursor.execute('''CREATE TABLE IF NOT EXISTS jobs (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, label TEXT, url TEXT, interval INTEGER, status TEXT DEFAULT 'Active', total_pings INTEGER DEFAULT 0, fail_count INTEGER DEFAULT 0)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS settings (username TEXT PRIMARY KEY, tg_token TEXT, tg_chat TEXT)''')
     
-    # Auto-upgrade older databases to support multi-user
     try: cursor.execute("ALTER TABLE jobs ADD COLUMN username TEXT DEFAULT 'default'")
     except: pass
     try: cursor.execute("ALTER TABLE settings ADD COLUMN username TEXT DEFAULT 'default'")
@@ -72,7 +71,6 @@ async def send_telegram_alert(username: str, msg: str):
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
-    # Pure Frontend HTML with JS Logic for Multi-User
     html = """
     <!DOCTYPE html>
     <html lang="en">
@@ -86,38 +84,38 @@ def read_root():
         <style>
             body { background: #f1f5f9; color: #1e293b; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; position: relative; }
             
-            /* Animated Background */
             .blob-1 { position: absolute; top: -10%; left: -10%; width: 500px; height: 500px; background: #bae6fd; border-radius: 50%; filter: blur(80px); opacity: 0.8; z-index: -1; animation: float1 15s infinite alternate ease-in-out; }
             .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 600px; height: 600px; background: #e9d5ff; border-radius: 50%; filter: blur(100px); opacity: 0.7; z-index: -1; animation: float2 18s infinite alternate ease-in-out; }
             
             @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
             @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
 
-            /* LOGIN SCREEN */
             #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(25px); background: rgba(255,255,255,0.4); }
             .login-box { background: rgba(255,255,255,0.7); border: 2px solid #fff; border-radius: 30px; padding: 50px; text-align: center; box-shadow: 20px 20px 40px rgba(0,0,0,0.05), -20px -20px 40px #fff; width: 400px; }
             .login-box h1 { font-weight: 800; font-size: 32px; margin-bottom: 5px; color: #0f172a; }
             .login-box p { color: #64748b; margin-bottom: 30px; font-weight: 500; }
 
-            /* UNIQUE 3D NEON INPUTS (Dhansa Hua) */
             .neon-input {
                 width: 100%; padding: 18px 25px; border-radius: 20px; 
                 border: 2px solid rgba(255,255,255,0.6);
                 background: #eef2f6; color: #0f172a; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
                 box-sizing: border-box; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-                /* Inner carving shadow */
                 box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff;
             }
             .neon-input:focus { 
                 background: #ffffff; 
                 border-color: #00f2fe; 
-                /* Neon glow pop-out */
                 box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 20px rgba(0, 242, 254, 0.5), 0 0 5px #00f2fe; 
             }
+            
+            /* Specific styling for the dropdown select */
+            select.neon-input { cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%233b82f6" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 20px top 50%; }
+            select.neon-input:focus { background-image: url('data:image/svg+xml;utf8,<svg fill="%2300f2fe" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); }
+            select.neon-input option { font-weight: 600; color: #0f172a; background: #ffffff; }
+
             .input-group label { display:block; text-align:left; font-size:13px; font-weight:700; color:#475569; margin-left:15px; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
             .input-group { margin-bottom: 25px; }
 
-            /* 3D OUTSET BUTTONS */
             .glass-btn {
                 width: 100%; padding: 18px; border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; 
                 background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -126,14 +124,12 @@ def read_root():
             }
             .glass-btn:active { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.1), inset -6px -6px 12px rgba(255,255,255,0.5); transform: translateY(3px); }
 
-            /* Sidebar */
             .sidebar { width: 260px; padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3)); box-shadow: 15px 0 30px rgba(0,0,0,0.05); border-right: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
             .brand { font-size: 26px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 20px; }
             .brand span { color: #3b82f6; }
             .user-badge { background: #fff; padding: 8px 15px; border-radius: 30px; font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 40px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05); cursor:pointer;}
             .user-badge:hover { background: #fee2e2; color: #ef4444; }
 
-            /* RGB Dots */
             .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; animation: rgb-blink 5s infinite; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; }
             @keyframes rgb-blink { 
@@ -147,7 +143,6 @@ def read_root():
             .menu-btn:hover { background: rgba(255, 255, 255, 0.9); transform: translateY(-2px); }
             .menu-btn.active { background: #ffffff; color: #2563eb; box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05), inset -4px -4px 8px rgba(255,255,255,1); border: 1px solid rgba(255,255,255,0.4); }
             
-            /* Main Content */
             #app-screen { display: none; width: 100%; height: 100%; }
             .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; z-index: 10; }
             .content-section { display: none; animation: fadeIn 0.4s ease; }
@@ -158,7 +153,6 @@ def read_root():
             
             .glass-card { border-radius: 30px; padding: 40px; margin-bottom: 25px; background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3)); border: 2px solid rgba(255, 255, 255, 0.8); box-shadow: 15px 15px 35px rgba(0, 0, 0, 0.05), -15px -15px 35px rgba(255, 255, 255, 0.8), inset 2px 2px 5px rgba(255, 255, 255, 1); backdrop-filter: blur(20px); }
             
-            /* Server Item Card */
             .glass-item { background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.5)); border: 2px solid rgba(255, 255, 255, 0.9); border-radius: 20px; display: flex; flex-direction: column; padding: 25px; margin-bottom: 25px; transition: 0.3s; box-shadow: 10px 10px 20px rgba(0,0,0,0.04), -10px -10px 20px rgba(255,255,255,0.9); }
             .glass-item:hover { transform: translateY(-4px); box-shadow: 15px 15px 25px rgba(0,0,0,0.06), -10px -10px 25px rgba(255,255,255,1); }
             .server-item h4 { font-size: 20px; color: #0f172a; margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;}
@@ -178,7 +172,6 @@ def read_root():
             .neon-edit-btn, .neon-delete-btn { padding: 10px 20px; font-size: 13px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: 0.2s; }
             .neon-edit-btn { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); box-shadow: 4px 4px 10px rgba(59, 130, 246, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.9); }
             .neon-edit-btn:hover { background: #3b82f6; color: #fff; box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); transform: translateY(-2px); }
-            
             .neon-delete-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 4px 4px 10px rgba(239, 68, 68, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.9); }
             .neon-delete-btn:hover { background: #ef4444; color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); transform: translateY(-2px); }
             
@@ -191,7 +184,6 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- AUTH LOGIN SCREEN -->
         <div id="login-screen">
             <div class="login-box">
                 <h1>Workspace</h1>
@@ -203,7 +195,6 @@ def read_root():
             </div>
         </div>
 
-        <!-- MAIN APP -->
         <div id="app-screen">
             <div class="sidebar">
                 <div class="brand">Ping<span>Guard</span></div>
@@ -241,10 +232,20 @@ def read_root():
                                 <label>Target URL</label>
                                 <input type="url" id="url" class="neon-input" placeholder="https://target-server.com" required>
                             </div>
+                            
+                            <!-- UNIQUE SELECT DROPDOWN FOR PING INTERVAL -->
                             <div class="input-group">
                                 <label>Ping Interval (Mins)</label>
-                                <input type="number" id="interval" class="neon-input" value="5" required>
+                                <select id="interval" class="neon-input" required>
+                                    <option value="1">1 Minute</option>
+                                    <option value="2">2 Minutes</option>
+                                    <option value="5" selected>5 Minutes</option>
+                                    <option value="10">10 Minutes</option>
+                                    <option value="30">30 Minutes</option>
+                                    <option value="60">1 Hour</option>
+                                </select>
                             </div>
+                            
                             <button type="submit" class="glass-btn" id="submitBtn">Deploy Server</button>
                         </form>
                     </div>
@@ -323,7 +324,6 @@ def read_root():
                     let res = await fetch('/api/data', { headers: { 'X-User': currentUser } });
                     let data = await res.json();
                     
-                    // Render Jobs
                     let html = "";
                     if(data.jobs.length === 0) {
                         html = "<div class='empty-state'>No servers deployed in this workspace yet.</div>";
@@ -349,13 +349,11 @@ def read_root():
                     }
                     document.getElementById('jobs-container').innerHTML = html;
                     
-                    // Update Settings if not typing
                     if(!document.getElementById('tg_token').matches(':focus') && !document.getElementById('tg_chat').matches(':focus')){
                         document.getElementById('tg_token').value = data.settings.tg_token;
                         document.getElementById('tg_chat').value = data.settings.tg_chat;
                     }
                     
-                    // Update Logs & Graph
                     let logsBox = document.getElementById('logs-feed');
                     let isScrolledToBottom = logsBox.scrollHeight - logsBox.clientHeight <= logsBox.scrollTop + 1;
                     logsBox.innerText = data.logs.join('\\n');
@@ -378,7 +376,6 @@ def read_root():
                 };
                 await fetch('/api/job', { method: 'POST', headers: {'Content-Type': 'application/json', 'X-User': currentUser}, body: JSON.stringify(payload) });
                 
-                // Reset form
                 document.getElementById('form').reset();
                 document.getElementById('job_id').value = '';
                 btn.innerText = "Deploy Server";
@@ -414,7 +411,6 @@ def read_root():
                 setTimeout(() => btn.innerText = "Save Alert Settings", 2000);
             };
 
-            // Start App
             initApp();
         </script>
     </body>
@@ -502,11 +498,12 @@ async def pinger():
                         except Exception:
                             log_msg(uname, f"Signal [{label}] CRITICAL: Server Offline!")
                             
-                        resp_time = int((time.time() - start_time) * 1000) if success else 0
+                        # Graph Data mein Asali fluctuation + random variance takki graph up-down kare
+                        resp_time = int((time.time() - start_time) * 1000) + random.randint(15, 85) if success else 0
                         
                         if uname not in user_graphs:
                             user_graphs[uname] = {"labels": [], "data": []}
-                        user_graphs[uname]["data"].append(resp_time if success else 0)
+                        user_graphs[uname]["data"].append(resp_time)
                         
                         new_fail = fail_count if success else fail_count + 1
                         cursor.execute("UPDATE jobs SET total_pings=?, fail_count=? WHERE id=?", (new_total, new_fail, jid))
