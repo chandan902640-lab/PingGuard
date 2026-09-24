@@ -100,22 +100,25 @@ def read_root():
             }
             
             .login-glass-box { 
-                background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.2)); 
-                border: 2px solid rgba(255,255,255,0.8); border-radius: 35px; 
+                background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5)); 
+                border: 2px solid rgba(255,255,255,0.9); border-radius: 35px; 
                 padding: 50px 40px; text-align: center; width: 420px; 
                 backdrop-filter: blur(30px); transition: 0.4s;
-                /* Base 3D shadow + subtle Cyan Neon Glow */
-                box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 40px rgba(0, 242, 254, 0.2); 
+                /* Multi-color Animated 3D Shadow */
+                animation: login-neon-pulse 5s infinite;
             }
-            .login-glass-box:hover { 
-                transform: translateY(-5px); 
-                /* Stronger Neon glow on hover */
-                box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 60px rgba(0, 242, 254, 0.4); 
+            
+            @keyframes login-neon-pulse {
+                0% { box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 35px rgba(255, 107, 0, 0.25); }
+                30% { box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 35px rgba(0, 255, 0, 0.25); }
+                60% { box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 35px rgba(0, 229, 255, 0.25); }
+                100% { box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 35px rgba(255, 107, 0, 0.25); }
             }
+
+            .login-glass-box:hover { transform: translateY(-5px); }
             
             .neon-title { 
                 font-weight: 800; font-size: 38px; margin: 10px 0; color: #0f172a; 
-                /* Text Neon Glow */
                 text-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 1px 1px 2px rgba(255,255,255,1); 
                 letter-spacing: 1px; 
             }
@@ -125,14 +128,13 @@ def read_root():
                 width: 100%; padding: 20px 25px; border-radius: 20px; 
                 border: 2px solid rgba(255,255,255,0.9); 
                 background: rgba(225, 235, 245, 0.6); color: #0f172a; 
-                font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; text-align: center; 
-                /* Inset carved 3D effect */
+                font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; text-align: center; 
                 box-shadow: inset 6px 6px 12px rgba(0,0,0,0.06), inset -6px -6px 12px rgba(255,255,255,1); 
                 transition: 0.3s; margin-bottom: 30px; outline: none; 
             }
+            .login-neon-input::placeholder { color: #94a3b8; font-weight: 500; text-transform: none; letter-spacing: normal; }
             .login-neon-input:focus { 
                 background: #fff; border-color: #00f2fe; 
-                /* Pop-out Neon Blue Glow */
                 box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 25px rgba(0, 242, 254, 0.6), 0 0 8px #00f2fe; 
                 transform: scale(1.03); 
             }
@@ -142,29 +144,15 @@ def read_root():
                 background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); 
                 color: #ffffff; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; 
                 text-transform: uppercase; letter-spacing: 2px; 
-                /* Outset 3D effect + Neon Shadow */
                 box-shadow: 8px 8px 20px rgba(0, 242, 254, 0.4), -8px -8px 20px rgba(255, 255, 255, 0.9), inset 2px 2px 5px rgba(255,255,255,0.5); 
             }
-            .login-glass-btn:hover { 
-                box-shadow: 12px 12px 25px rgba(0, 242, 254, 0.6), -12px -12px 25px rgba(255, 255, 255, 1); 
-                transform: translateY(-2px); 
-            }
-            .login-glass-btn:active { 
-                /* Pressed-in 3D effect */
-                box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); 
-                transform: translateY(3px); 
-            }
+            .login-glass-btn:hover { box-shadow: 12px 12px 25px rgba(0, 242, 254, 0.6), -12px -12px 25px rgba(255, 255, 255, 1); transform: translateY(-2px); }
+            .login-glass-btn:active { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); transform: translateY(3px); }
 
             /* =========================================
-               REST OF THE APP UI (Kept as before)
+               REST OF THE APP UI
                ========================================= */
-            .neon-input {
-                width: 100%; padding: 18px 25px; border-radius: 20px; 
-                border: 2px solid rgba(255,255,255,0.6);
-                background: #eef2f6; color: #0f172a; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
-                box-sizing: border-box; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-                box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff;
-            }
+            .neon-input { width: 100%; padding: 18px 25px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.6); background: #eef2f6; color: #0f172a; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; box-sizing: border-box; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff; }
             .neon-input:focus { background: #ffffff; border-color: #00f2fe; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 20px rgba(0, 242, 254, 0.5), 0 0 5px #00f2fe; }
             select.neon-input { cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%233b82f6" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 20px top 50%; }
             select.neon-input:focus { background-image: url('data:image/svg+xml;utf8,<svg fill="%2300f2fe" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); }
@@ -182,8 +170,10 @@ def read_root():
             .user-badge { background: #fff; padding: 8px 15px; border-radius: 30px; font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 40px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05); cursor:pointer;}
             .user-badge:hover { background: #fee2e2; color: #ef4444; }
 
-            .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; animation: rgb-blink 5s infinite; }
+            .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; animation: rgb-blink 5s infinite; }
+            .sidebar .dot-blink { margin-right: 8px; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; }
+            
             @keyframes rgb-blink { 
                 0% { background-color: #ff6b00; box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); } 8% { box-shadow: 0 0 0 8px rgba(255, 107, 0, 0); }
                 30% { background-color: #00ff00; box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.8); } 38% { box-shadow: 0 0 0 8px rgba(0, 255, 0, 0); }
@@ -236,14 +226,18 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- UPDATED STEP 1: NEON + GLASS LOGIN -->
+        <!-- NEW UPDATED LOGIN SCREEN -->
         <div id="login-screen">
             <div class="login-glass-box">
-                <div style="font-size: 40px; margin-bottom: -10px; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8);">🛡️</div>
+                <!-- Multi-Colour Blinker integrated with Shield -->
+                <div style="font-size: 40px; margin-bottom: 5px; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8);">
+                    <span class="dot-blink" style="width: 16px; height: 16px; margin-right: 12px; vertical-align: middle;"></span>🛡️
+                </div>
                 <h1 class="neon-title">Workspace</h1>
                 <p>Gateway to your servers</p>
                 <div class="input-group" style="margin-bottom: 0;">
-                    <input type="text" id="workspaceInput" class="login-neon-input" placeholder="Enter Unique ID..." autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
+                    <!-- Placeholder changed to "Login Name..." -->
+                    <input type="text" id="workspaceInput" class="login-neon-input" placeholder="Login Name..." autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
                 </div>
                 <button class="login-glass-btn" onclick="login()">Enter Dashboard</button>
             </div>
@@ -329,11 +323,9 @@ def read_root():
                 if (!currentUser) {
                     document.getElementById('login-screen').style.display = 'flex';
                     document.getElementById('app-screen').style.display = 'none';
-                    // Apply blur to background elements when login is shown
                     document.body.style.overflow = 'hidden';
                     document.getElementById('workspaceInput').focus();
                 } else {
-                    // Smooth transition from login to app
                     document.getElementById('login-screen').style.opacity = '0';
                     setTimeout(() => {
                         document.getElementById('login-screen').style.display = 'none';
@@ -351,7 +343,7 @@ def read_root():
                         
                         fetchData();
                         setInterval(fetchData, 3000);
-                    }, 400); // 400ms match transition time
+                    }, 400); 
                 }
             }
 
