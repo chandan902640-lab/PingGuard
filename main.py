@@ -11,7 +11,6 @@ from typing import Optional
 app = FastAPI(title="PingGuard Multi-User 3D")
 DB_NAME = "database.db"
 
-# Memory state for logs and graphs per user
 user_logs = {}
 user_graphs = {}
 
@@ -90,11 +89,75 @@ def read_root():
             @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
             @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
 
-            #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(25px); background: rgba(255,255,255,0.4); }
-            .login-box { background: rgba(255,255,255,0.7); border: 2px solid #fff; border-radius: 30px; padding: 50px; text-align: center; box-shadow: 20px 20px 40px rgba(0,0,0,0.05), -20px -20px 40px #fff; width: 400px; }
-            .login-box h1 { font-weight: 800; font-size: 32px; margin-bottom: 5px; color: #0f172a; }
-            .login-box p { color: #64748b; margin-bottom: 30px; font-weight: 500; }
+            /* =========================================
+               STEP 1: THE GATEWAY (NEON + GLASS LOGIN)
+               ========================================= */
+            #login-screen { 
+                position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; 
+                z-index: 1000; 
+                backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+                background: rgba(241, 245, 249, 0.5); 
+            }
+            
+            .login-glass-box { 
+                background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.2)); 
+                border: 2px solid rgba(255,255,255,0.8); border-radius: 35px; 
+                padding: 50px 40px; text-align: center; width: 420px; 
+                backdrop-filter: blur(30px); transition: 0.4s;
+                /* Base 3D shadow + subtle Cyan Neon Glow */
+                box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 40px rgba(0, 242, 254, 0.2); 
+            }
+            .login-glass-box:hover { 
+                transform: translateY(-5px); 
+                /* Stronger Neon glow on hover */
+                box-shadow: 15px 15px 35px rgba(0,0,0,0.1), -15px -15px 35px rgba(255,255,255,0.9), 0 0 60px rgba(0, 242, 254, 0.4); 
+            }
+            
+            .neon-title { 
+                font-weight: 800; font-size: 38px; margin: 10px 0; color: #0f172a; 
+                /* Text Neon Glow */
+                text-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 1px 1px 2px rgba(255,255,255,1); 
+                letter-spacing: 1px; 
+            }
+            .login-glass-box p { color: #475569; margin-bottom: 35px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px;}
 
+            .login-neon-input { 
+                width: 100%; padding: 20px 25px; border-radius: 20px; 
+                border: 2px solid rgba(255,255,255,0.9); 
+                background: rgba(225, 235, 245, 0.6); color: #0f172a; 
+                font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; text-align: center; 
+                /* Inset carved 3D effect */
+                box-shadow: inset 6px 6px 12px rgba(0,0,0,0.06), inset -6px -6px 12px rgba(255,255,255,1); 
+                transition: 0.3s; margin-bottom: 30px; outline: none; 
+            }
+            .login-neon-input:focus { 
+                background: #fff; border-color: #00f2fe; 
+                /* Pop-out Neon Blue Glow */
+                box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 25px rgba(0, 242, 254, 0.6), 0 0 8px #00f2fe; 
+                transform: scale(1.03); 
+            }
+            
+            .login-glass-btn { 
+                width: 100%; padding: 18px; border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; 
+                background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); 
+                color: #ffffff; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s; 
+                text-transform: uppercase; letter-spacing: 2px; 
+                /* Outset 3D effect + Neon Shadow */
+                box-shadow: 8px 8px 20px rgba(0, 242, 254, 0.4), -8px -8px 20px rgba(255, 255, 255, 0.9), inset 2px 2px 5px rgba(255,255,255,0.5); 
+            }
+            .login-glass-btn:hover { 
+                box-shadow: 12px 12px 25px rgba(0, 242, 254, 0.6), -12px -12px 25px rgba(255, 255, 255, 1); 
+                transform: translateY(-2px); 
+            }
+            .login-glass-btn:active { 
+                /* Pressed-in 3D effect */
+                box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); 
+                transform: translateY(3px); 
+            }
+
+            /* =========================================
+               REST OF THE APP UI (Kept as before)
+               ========================================= */
             .neon-input {
                 width: 100%; padding: 18px 25px; border-radius: 20px; 
                 border: 2px solid rgba(255,255,255,0.6);
@@ -102,13 +165,7 @@ def read_root():
                 box-sizing: border-box; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
                 box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff;
             }
-            .neon-input:focus { 
-                background: #ffffff; 
-                border-color: #00f2fe; 
-                box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 20px rgba(0, 242, 254, 0.5), 0 0 5px #00f2fe; 
-            }
-            
-            /* Specific styling for the dropdown select */
+            .neon-input:focus { background: #ffffff; border-color: #00f2fe; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 20px rgba(0, 242, 254, 0.5), 0 0 5px #00f2fe; }
             select.neon-input { cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%233b82f6" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 20px top 50%; }
             select.neon-input:focus { background-image: url('data:image/svg+xml;utf8,<svg fill="%2300f2fe" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); }
             select.neon-input option { font-weight: 600; color: #0f172a; background: #ffffff; }
@@ -116,12 +173,7 @@ def read_root():
             .input-group label { display:block; text-align:left; font-size:13px; font-weight:700; color:#475569; margin-left:15px; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
             .input-group { margin-bottom: 25px; }
 
-            .glass-btn {
-                width: 100%; padding: 18px; border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; 
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                color: #ffffff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px;
-                box-shadow: 8px 8px 20px rgba(0, 242, 254, 0.3), -8px -8px 20px rgba(255, 255, 255, 0.9), inset 2px 2px 5px rgba(255,255,255,0.5);
-            }
+            .glass-btn { width: 100%; padding: 18px; border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #ffffff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 8px 8px 20px rgba(0, 242, 254, 0.3), -8px -8px 20px rgba(255, 255, 255, 0.9), inset 2px 2px 5px rgba(255,255,255,0.5); }
             .glass-btn:active { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.1), inset -6px -6px 12px rgba(255,255,255,0.5); transform: translateY(3px); }
 
             .sidebar { width: 260px; padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3)); box-shadow: 15px 0 30px rgba(0,0,0,0.05); border-right: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
@@ -143,7 +195,7 @@ def read_root():
             .menu-btn:hover { background: rgba(255, 255, 255, 0.9); transform: translateY(-2px); }
             .menu-btn.active { background: #ffffff; color: #2563eb; box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05), inset -4px -4px 8px rgba(255,255,255,1); border: 1px solid rgba(255,255,255,0.4); }
             
-            #app-screen { display: none; width: 100%; height: 100%; }
+            #app-screen { display: none; width: 100%; height: 100%; filter: blur(0px); transition: filter 0.5s;}
             .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; z-index: 10; }
             .content-section { display: none; animation: fadeIn 0.4s ease; }
             .content-section.active { display: block; }
@@ -184,14 +236,16 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
+        <!-- UPDATED STEP 1: NEON + GLASS LOGIN -->
         <div id="login-screen">
-            <div class="login-box">
-                <h1>Workspace</h1>
-                <p>Enter unique name to access your data</p>
-                <div class="input-group">
-                    <input type="text" id="workspaceInput" class="neon-input" placeholder="e.g. chandan_admin" autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
+            <div class="login-glass-box">
+                <div style="font-size: 40px; margin-bottom: -10px; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8);">🛡️</div>
+                <h1 class="neon-title">Workspace</h1>
+                <p>Gateway to your servers</p>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="text" id="workspaceInput" class="login-neon-input" placeholder="Enter Unique ID..." autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
                 </div>
-                <button class="glass-btn" onclick="login()">Enter Dashboard</button>
+                <button class="login-glass-btn" onclick="login()">Enter Dashboard</button>
             </div>
         </div>
 
@@ -232,8 +286,6 @@ def read_root():
                                 <label>Target URL</label>
                                 <input type="url" id="url" class="neon-input" placeholder="https://target-server.com" required>
                             </div>
-                            
-                            <!-- UNIQUE SELECT DROPDOWN FOR PING INTERVAL -->
                             <div class="input-group">
                                 <label>Ping Interval (Mins)</label>
                                 <select id="interval" class="neon-input" required>
@@ -245,7 +297,6 @@ def read_root():
                                     <option value="60">1 Hour</option>
                                 </select>
                             </div>
-                            
                             <button type="submit" class="glass-btn" id="submitBtn">Deploy Server</button>
                         </form>
                     </div>
@@ -278,22 +329,29 @@ def read_root():
                 if (!currentUser) {
                     document.getElementById('login-screen').style.display = 'flex';
                     document.getElementById('app-screen').style.display = 'none';
+                    // Apply blur to background elements when login is shown
+                    document.body.style.overflow = 'hidden';
                     document.getElementById('workspaceInput').focus();
                 } else {
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('app-screen').style.display = 'flex';
-                    document.getElementById('displayUser').innerText = currentUser;
-                    
-                    const ctx = document.getElementById('liveChart').getContext('2d');
-                    if(liveChart) liveChart.destroy();
-                    liveChart = new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: [], datasets: [{ label: 'Response Time (ms)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#10b981', pointRadius: 5 }] },
-                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
-                    });
-                    
-                    fetchData();
-                    setInterval(fetchData, 3000);
+                    // Smooth transition from login to app
+                    document.getElementById('login-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('login-screen').style.opacity = '1';
+                        document.getElementById('app-screen').style.display = 'flex';
+                        document.getElementById('displayUser').innerText = currentUser;
+                        
+                        const ctx = document.getElementById('liveChart').getContext('2d');
+                        if(liveChart) liveChart.destroy();
+                        liveChart = new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: [], datasets: [{ label: 'Response Time (ms)', data: [], borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.2)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#4facfe', pointRadius: 5 }] },
+                            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+                        });
+                        
+                        fetchData();
+                        setInterval(fetchData, 3000);
+                    }, 400); // 400ms match transition time
                 }
             }
 
@@ -498,7 +556,6 @@ async def pinger():
                         except Exception:
                             log_msg(uname, f"Signal [{label}] CRITICAL: Server Offline!")
                             
-                        # Graph Data mein Asali fluctuation + random variance takki graph up-down kare
                         resp_time = int((time.time() - start_time) * 1000) + random.randint(15, 85) if success else 0
                         
                         if uname not in user_graphs:
