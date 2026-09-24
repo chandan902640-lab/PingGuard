@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="PingGuard 3D Glass")
+app = FastAPI(title="PingGuard Cyber-Glass")
 DB_NAME = "database.db"
-live_logs = ["[SYSTEM] PingGuard Glass Engine Initialized..."]
+live_logs = ["[SYSTEM] PingGuard Cyber-Glass Engine Initialized..."]
 
 def log_msg(text):
     live_logs.append(f"[{time.strftime('%H:%M:%S')}] {text}")
@@ -43,14 +43,14 @@ def read_root():
             <div>
                 <h4>{r[1]}</h4>
                 <a href="{r[2]}" target="_blank">{r[2]}</a>
-                <p>Interval: {r[3]} mins | Status: <span style="color: #27ae60; font-weight: bold;">{r[4]}</span></p>
+                <p>Interval: {r[3]} mins | Status: <span style="color: #00ffcc; font-weight: bold; text-shadow: 0 0 5px #00ffcc;">{r[4]}</span></p>
             </div>
-            <button class="glass-btn delete-btn" onclick="delJob({r[0]})">Delete</button>
+            <button class="neon-btn delete-btn" onclick="delJob({r[0]})">Delete</button>
         </div>
         """
     
     if not jobs_list:
-        jobs_list = "<p style='text-align:center; color:#7f8c8d; padding:20px;'>Abhi koi server added nahi hai. Apna URL add karein!</p>"
+        jobs_list = "<div class='empty-state'><p>No active monitors. Add a URL in the 'Deploy' tab.</p></div>"
 
     html = """
     <!DOCTYPE html>
@@ -58,147 +58,224 @@ def read_root():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PingGuard | 3D Glass UI</title>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+        <title>PingGuard | Cyber Glass UI</title>
+        <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
         
         <style>
+            :root {
+                --bg-dark: #0a0e17;
+                --glass-bg: rgba(16, 22, 37, 0.6);
+                --glass-border: rgba(0, 255, 204, 0.2);
+                --neon-cyan: #00ffcc;
+                --neon-blue: #0088ff;
+                --neon-red: #ff0055;
+                --text-main: #e0f2fe;
+                --text-muted: #8ba2b5;
+            }
+            
             body { 
-                background: #e0e5ec; /* Light gray background matching your Spline image */
-                color: #2c3e50; 
-                font-family: 'Poppins', sans-serif; 
-                margin: 0; padding: 30px 15px; 
-                display: flex; flex-direction: column; align-items: center;
+                background-color: var(--bg-dark); 
+                background-image: 
+                    radial-gradient(circle at 15% 50%, rgba(0, 136, 255, 0.08), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(0, 255, 204, 0.08), transparent 25%);
+                color: var(--text-main); 
+                font-family: 'Rajdhani', sans-serif; 
+                margin: 0; padding: 0; 
+                display: flex; height: 100vh; overflow: hidden;
             }
-            .container { max-width: 800px; width: 100%; }
             
-            /* The 3D Glass / Neumorphism Effect for Cards */
+            /* Sidebar (Left Menu) */
+            .sidebar {
+                width: 250px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border-right: 1px solid var(--glass-border);
+                padding: 30px 20px;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+                z-index: 10;
+            }
+            
+            .brand {
+                font-size: 28px; font-weight: 700; color: #fff;
+                text-align: center; margin-bottom: 40px; letter-spacing: 2px;
+                text-shadow: 0 0 10px var(--neon-cyan);
+            }
+            .brand span { color: var(--neon-cyan); }
+            
+            .menu-btn {
+                background: transparent; color: var(--text-muted);
+                border: 1px solid transparent; border-radius: 8px;
+                padding: 15px 20px; margin-bottom: 15px;
+                font-size: 18px; font-weight: 600; font-family: 'Rajdhani', sans-serif;
+                text-align: left; cursor: pointer; transition: all 0.3s;
+                display: flex; align-items: center; gap: 10px;
+            }
+            
+            .menu-btn:hover {
+                background: rgba(0, 255, 204, 0.05); color: #fff;
+                border: 1px solid var(--glass-border);
+            }
+            
+            /* The Glowing Neon Active State */
+            .menu-btn.active {
+                background: rgba(0, 255, 204, 0.1);
+                color: var(--neon-cyan);
+                border: 1px solid var(--neon-cyan);
+                box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.2);
+                text-shadow: 0 0 5px var(--neon-cyan);
+            }
+            
+            /* Main Content Area */
+            .main-content {
+                flex: 1; padding: 40px; overflow-y: auto;
+                position: relative;
+            }
+            
+            /* Hide all sections by default, show only active */
+            .content-section { display: none; animation: fadeIn 0.4s ease; }
+            .content-section.active { display: block; }
+            
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            
+            h2 { font-size: 24px; font-weight: 600; margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; color: #fff; }
+            
+            /* Glass Cards */
             .glass-card {
-                background: rgba(224, 229, 236, 0.4);
+                background: var(--glass-bg);
                 backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
-                border: 1px solid rgba(255, 255, 255, 0.6);
-                border-radius: 20px;
-                padding: 25px;
-                margin-bottom: 25px;
-                box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.8);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px; padding: 25px; margin-bottom: 25px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             }
             
-            /* Pill Navigation Buttons (Like your screenshot) */
-            .nav-container { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
-            .glass-pill {
-                padding: 12px 30px;
-                border-radius: 30px;
-                background: #e0e5ec;
-                color: #34495e;
-                font-weight: 600;
-                font-size: 15px;
-                border: 1px solid rgba(255,255,255,0.4);
-                box-shadow: 6px 6px 12px #babecc, -6px -6px 12px #ffffff;
-                cursor: pointer; transition: all 0.2s ease;
-                display: flex; align-items: center; gap: 8px;
-            }
-            .glass-pill:hover { 
-                box-shadow: 2px 2px 5px #babecc, -2px -2px 5px #ffffff; 
-                transform: translateY(2px); 
-            }
-            .glass-pill.active {
-                box-shadow: inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff;
-                color: #3498db;
-            }
-            
-            h2 { margin-top: 0; font-weight: 600; color: #2c3e50; border-bottom: 2px solid rgba(255,255,255,0.5); padding-bottom: 10px; }
-            
-            /* Input Fields (Sunken 3D effect) */
-            .input-group { margin-bottom: 15px; }
+            /* Form Inputs */
+            .input-group { margin-bottom: 20px; }
             input {
-                width: 100%; padding: 14px; 
-                border-radius: 12px;
-                border: none;
-                background: #e0e5ec;
-                box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
-                color: #34495e; font-family: 'Poppins', sans-serif; font-size: 14px;
+                width: 100%; padding: 15px; 
+                background: rgba(0,0,0,0.4);
+                border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+                color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 16px;
                 box-sizing: border-box; outline: none; transition: 0.3s;
             }
-            input:focus { box-shadow: inset 2px 2px 5px #babecc, inset -2px -2px 5px #ffffff; }
+            input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 136, 255, 0.3); }
             
-            /* Submit Button (Raised 3D effect) */
-            .glass-btn {
-                width: 100%; padding: 14px; border: none; border-radius: 12px;
-                background: #3498db; color: white; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif;
-                box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
-                cursor: pointer; transition: 0.2s;
+            /* Neon Buttons */
+            .neon-btn {
+                width: 100%; padding: 15px; border: 1px solid var(--neon-blue); border-radius: 8px;
+                background: rgba(0, 136, 255, 0.1); color: var(--neon-blue);
+                font-weight: 700; font-size: 18px; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+                cursor: pointer; transition: 0.3s; text-transform: uppercase;
             }
-            .glass-btn:hover { 
-                background: #2980b9; 
-                transform: translateY(2px); 
-                box-shadow: 2px 2px 5px #babecc, -2px -2px 5px #ffffff; 
+            .neon-btn:hover { 
+                background: var(--neon-blue); color: #fff;
+                box-shadow: 0 0 20px rgba(0, 136, 255, 0.6); 
             }
             
-            .delete-btn { background: #e74c3c; width: auto; padding: 10px 20px; font-size: 13px; }
-            .delete-btn:hover { background: #c0392b; }
+            .delete-btn {
+                width: auto; padding: 8px 15px; font-size: 14px;
+                border-color: var(--neon-red); color: var(--neon-red); background: rgba(255, 0, 85, 0.1);
+            }
+            .delete-btn:hover { background: var(--neon-red); box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
             
             .server-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
-            .server-item h4 { margin: 0 0 5px 0; font-size: 16px; }
-            .server-item a { color: #3498db; text-decoration: none; font-size: 14px; font-weight: 500;}
-            .server-item a:hover { text-decoration: underline; }
-            .server-item p { margin: 8px 0 0 0; font-size: 12px; color: #7f8c8d; }
+            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #fff; }
+            .server-item a { color: var(--neon-blue); text-decoration: none; font-size: 15px; }
+            .server-item a:hover { text-shadow: 0 0 5px var(--neon-blue); }
+            .server-item p { margin: 8px 0 0 0; font-size: 14px; color: var(--text-muted); }
             
-            /* Terminal/Logs (Sunken 3D effect) */
-            .logs { 
-                background: #e0e5ec; 
-                box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff; 
-                color: #27ae60; padding: 20px; height: 160px; overflow-y: auto; 
-                border-radius: 12px; font-family: monospace; font-size: 13px; font-weight: 600; line-height: 1.6; 
+            .empty-state { text-align: center; padding: 40px; color: var(--text-muted); border: 1px dashed var(--glass-border); border-radius: 12px; }
+            
+            /* Terminal/Logs */
+            .logs-container { 
+                background: rgba(0,0,0,0.7); border: 1px solid rgba(0, 255, 204, 0.3);
+                color: var(--neon-cyan); padding: 20px; height: 300px; overflow-y: auto; 
+                border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; 
+                box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
             }
             
-            /* Custom Scrollbar for logs */
-            ::-webkit-scrollbar { width: 8px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: #babecc; border-radius: 10px; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+            ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
         </style>
     </head>
     <body>
         
-        <div class="container">
-            <!-- 3D Glass Pill Navigation -->
-            <div class="nav-container">
-                <div class="glass-pill active">🏠 Dashboard</div>
-                <div class="glass-pill">⚙️ Settings</div>
-                <div class="glass-pill">📊 Analytics</div>
+        <!-- Sidebar Menu -->
+        <div class="sidebar">
+            <div class="brand">Ping<span>Guard</span></div>
+            
+            <button class="menu-btn active" onclick="switchTab('dashboard', this)">
+                ⚡ Active Monitors
+            </button>
+            <button class="menu-btn" onclick="switchTab('deploy', this)">
+                🚀 Deploy New
+            </button>
+            <button class="menu-btn" onclick="switchTab('logs', this)">
+                💻 System Terminal
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            
+            <!-- Dashboard Tab (Shows active servers) -->
+            <div id="dashboard" class="content-section active">
+                <div class="glass-card">
+                    <h2>Active Infrastructures</h2>
+                    <div id="jobs">REPLACE_JOBS_HTML</div>
+                </div>
             </div>
 
-            <div class="glass-card">
-                <h2>Deploy Monitor</h2>
-                <form id="form">
-                    <div class="input-group">
-                        <input type="text" id="label" placeholder="Project Name (e.g. My Bot)" required autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <input type="url" id="url" placeholder="https://your-project.onrender.com" required autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="interval" value="5" placeholder="Check Interval (Mins)" required>
-                    </div>
-                    <button type="submit" class="glass-btn" id="submitBtn">Start Pinging</button>
-                </form>
+            <!-- Deploy Tab (Add new server form) -->
+            <div id="deploy" class="content-section">
+                <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+                    <h2>Initialize Monitor Engine</h2>
+                    <form id="form">
+                        <div class="input-group">
+                            <input type="text" id="label" placeholder="Project Tag (e.g. Node API)" required autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <input type="url" id="url" placeholder="https://target-server.com" required autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="interval" value="5" placeholder="Ping Interval (Mins)" required>
+                        </div>
+                        <button type="submit" class="neon-btn" id="submitBtn">Engage Monitor</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="glass-card">
-                <h2>Active Servers</h2>
-                <div id="jobs">REPLACE_JOBS_HTML</div>
+            <!-- Logs Tab (Live terminal) -->
+            <div id="logs" class="content-section">
+                <div class="glass-card">
+                    <h2>Live Server Feed</h2>
+                    <div id="logs-feed" class="logs-container">Awaiting connection...</div>
+                </div>
             </div>
 
-            <div class="glass-card">
-                <h2>Live Logs</h2>
-                <div id="logs" class="logs">Loading logs...</div>
-            </div>
         </div>
 
         <script>
+            // Tab Switching Logic
+            function switchTab(tabId, btnElement) {
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+                // Remove active class from all buttons
+                document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+                
+                // Show target section and highlight clicked button
+                document.getElementById(tabId).classList.add('active');
+                btnElement.classList.add('active');
+            }
+
+            // Add Server Logic
             document.getElementById('form').onsubmit = async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('submitBtn');
-                btn.innerText = "Deploying...";
+                btn.innerText = "Processing...";
                 let res = await fetch('/add', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -210,20 +287,22 @@ def read_root():
                 });
                 let data = await res.json();
                 if(data.status === 'ok') { location.reload(); }
-                else { alert(data.msg); btn.innerText = "Start Pinging"; }
+                else { alert(data.msg); btn.innerText = "Engage Monitor"; }
             };
             
+            // Delete Server Logic
             async function delJob(id) { 
-                if(confirm("Stop monitoring this server?")) {
+                if(confirm("Terminate this monitor instance?")) {
                     await fetch('/del/' + id, { method: 'POST' }); 
                     location.reload(); 
                 }
             }
             
+            // Fetch Logs Logic
             setInterval(async () => {
                 let res = await fetch('/logs');
                 let data = await res.json();
-                let logsBox = document.getElementById('logs');
+                let logsBox = document.getElementById('logs-feed');
                 let isScrolledToBottom = logsBox.scrollHeight - logsBox.clientHeight <= logsBox.scrollTop + 1;
                 logsBox.innerText = data.logs.join('\\n');
                 if (isScrolledToBottom) { logsBox.scrollTop = logsBox.scrollHeight; }
@@ -241,7 +320,7 @@ def add_job(job: Job):
     cursor.execute("INSERT INTO jobs (label, url, interval) VALUES (?, ?, ?)", (job.label, job.url, job.interval))
     conn.commit()
     conn.close()
-    log_msg(f"Started monitoring: {job.label}")
+    log_msg(f"Initiated monitoring sequence for: {job.label}")
     return {"status": "ok"}
 
 @app.post("/del/{jid}")
@@ -251,7 +330,7 @@ def del_job(jid: int):
     cursor.execute("DELETE FROM jobs WHERE id = ?", (jid,))
     conn.commit()
     conn.close()
-    log_msg(f"Deleted monitor ID: {jid}")
+    log_msg(f"Terminated instance ID: {jid}")
     return {"status": "ok"}
 
 @app.get("/logs")
@@ -272,9 +351,9 @@ async def pinger():
                     for label, url in rows:
                         try:
                             r = await client.get(url)
-                            log_msg(f"Ping [{label}] STATUS: {r.status_code} OK")
+                            log_msg(f"Signal [{label}] ST: {r.status_code} - SECURE")
                         except Exception as ex:
-                            log_msg(f"Ping [{label}] STATUS: Failed/Offline")
+                            log_msg(f"Signal [{label}] ALERT: OFFLINE/DROPPED")
         except Exception:
             pass
 
