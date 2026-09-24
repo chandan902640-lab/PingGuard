@@ -13,12 +13,11 @@ from typing import Optional
 app = FastAPI(title="PingGuard Multi-User 3D")
 DB_NAME = "database.db"
 GH_TOKEN = os.getenv("GH_TOKEN", "")
-GH_REPO = "chandan902640-lab/PingGuard" # Aapka GitHub repo naam
+GH_REPO = "chandan902640-lab/PingGuard"
 
 user_logs = {}
 user_graphs = {}
 
-# GitHub se database download karne ka function (Startup par)
 def sync_db_from_github():
     if not GH_TOKEN:
         return
@@ -31,11 +30,9 @@ def sync_db_from_github():
             file_bytes = base64.b64decode(content_b64)
             with open(DB_NAME, "wb") as f:
                 f.write(file_bytes)
-            print("[SYNC] Database downloaded successfully from GitHub.")
     except Exception as e:
-        print(f"[SYNC ERROR] Failed to pull DB from GitHub: {e}")
+        pass
 
-# GitHub par database upload/update karne ka function (Changes ke baad)
 def sync_db_to_github(commit_msg="Auto-sync database"):
     if not GH_TOKEN:
         return
@@ -43,7 +40,6 @@ def sync_db_to_github(commit_msg="Auto-sync database"):
         url = f"https://api.github.com/repos/{GH_REPO}/contents/{DB_NAME}"
         headers = {"Authorization": f"Bearer {GH_TOKEN}", "Accept": "application/vnd.github.v3+json"}
         
-        # Pehle file ka sha (version) nikalna padta hai update karne ke liye
         get_resp = httpx.get(url, headers=headers)
         sha = get_resp.json().get("sha") if get_resp.status_code == 200 else None
         
@@ -58,13 +54,10 @@ def sync_db_to_github(commit_msg="Auto-sync database"):
         if sha:
             payload["sha"] = sha
             
-        put_resp = httpx.put(url, headers=headers, json=payload)
-        if put_resp.status_code in [200, 201]:
-            print("[SYNC] Database pushed successfully to GitHub.")
+        httpx.put(url, headers=headers, json=payload)
     except Exception as e:
-        print(f"[SYNC ERROR] Failed to push DB to GitHub: {e}")
+        pass
 
-# Startup par sabse pehle GitHub se DB khichenge
 sync_db_from_github()
 
 def log_msg(username, text):
@@ -233,14 +226,32 @@ def read_root():
             
             .user-badge { 
                 background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,249,255,0.7)); 
-                padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 700; color: #0284c7; 
+                padding: 8px 12px 8px 15px; border-radius: 30px; font-size: 13px; font-weight: 700; color: #0284c7; 
                 text-align: center; margin-bottom: 40px; 
                 box-shadow: 5px 5px 15px rgba(0,0,0,0.05), -5px -5px 15px rgba(255,255,255,0.9), inset 2px 2px 5px rgba(255,255,255,1); 
-                cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+                display: flex; align-items: center; justify-content: space-between; gap: 8px;
                 border: 1px solid rgba(0, 242, 254, 0.4);
                 transition: 0.3s;
             }
-            .user-badge:hover { background: #fee2e2; color: #ef4444; border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+            
+            .logout-icon-btn {
+                background: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                color: #ef4444;
+                border-radius: 50px;
+                padding: 4px 10px;
+                font-size: 11px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: 0.2s;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .logout-icon-btn:hover {
+                background: #ef4444;
+                color: #fff;
+                box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+            }
 
             .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; animation: rgb-blink 5s infinite; }
             .sidebar .dot-blink { margin-right: 8px; }
@@ -329,9 +340,12 @@ def read_root():
             <div class="sidebar">
                 <div class="brand">⚡ Ping<span>Guard</span></div>
                 
-                <div class="user-badge" onclick="logout()" title="Click to Logout">
-                    <span class="dot-blink" style="width: 10px; height: 10px;"></span>
-                    👤 <span id="displayUser"></span>
+                <div class="user-badge">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="dot-blink" style="width: 10px; height: 10px;"></span>
+                        <span>👤 <span id="displayUser"></span></span>
+                    </div>
+                    <button class="logout-icon-btn" onclick="logout()" title="Logout">Logout</button>
                 </div>
                 
                 <button class="menu-btn active" onclick="switchTab('dashboard', this)"><span class="dot-blink dot-1"></span> Active Monitors</button>
@@ -436,10 +450,45 @@ def read_root():
                         
                         const ctx = document.getElementById('liveChart').getContext('2d');
                         if(liveChart) liveChart.destroy();
+                        
+                        // NEON SNAKE GLOWING GRAPH CONFIGURATION
                         liveChart = new Chart(ctx, {
                             type: 'line',
-                            data: { labels: [], datasets: [{ label: 'Response Time (ms)', data: [], borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.2)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#4facfe', pointRadius: 5 }] },
-                            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }
+                            data: { 
+                                labels: [], 
+                                datasets: [{ 
+                                    label: 'Response Time (ms)', 
+                                    data: [], 
+                                    borderColor: '#00f2fe', 
+                                    backgroundColor: 'rgba(0, 242, 254, 0.15)', 
+                                    borderWidth: 4, 
+                                    tension: 0.4, 
+                                    fill: true, 
+                                    pointBackgroundColor: '#00f2fe', 
+                                    pointBorderColor: '#ffffff',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 9
+                                }] 
+                            },
+                            options: { 
+                                responsive: true, 
+                                maintainAspectRatio: false, 
+                                plugins: {
+                                    legend: { labels: { font: { family: 'Poppins', weight: '600' } } }
+                                },
+                                scales: { 
+                                    y: { 
+                                        beginAtZero: true, 
+                                        grid: { color: 'rgba(0,0,0,0.04)' },
+                                        ticks: { font: { family: 'Poppins' } }
+                                    }, 
+                                    x: { 
+                                        grid: { display: false },
+                                        ticks: { font: { family: 'Poppins' } }
+                                    } 
+                                } 
+                            }
                         });
                         
                         fetchData();
