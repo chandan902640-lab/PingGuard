@@ -100,11 +100,12 @@ def read_root():
             }
             
             .login-glass-box { 
+                position: relative;
+                overflow: visible !important; /* Allows image to pop out of the box */
                 background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5)); 
                 border: 2px solid rgba(255,255,255,0.9); border-radius: 35px; 
-                padding: 40px 40px; text-align: center; width: 420px; 
+                padding: 60px 40px 40px 40px; text-align: center; width: 420px; 
                 backdrop-filter: blur(30px); transition: 0.4s;
-                /* Multi-color Animated 3D Shadow */
                 animation: login-neon-pulse 5s infinite;
             }
             
@@ -226,17 +227,14 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- NEW UPDATED LOGIN SCREEN WITH ANIME CHARACTER -->
+        <!-- NEW UPDATED LOGIN SCREEN WITH OVERFLOWING RECTANGULAR ANIME CHARACTER -->
         <div id="login-screen">
             <div class="login-glass-box">
                 
-                <!-- ANIME CHARACTER & MULTI-COLOUR BLINKER -->
-                <div style="margin-bottom: 5px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <span class="dot-blink" style="width: 14px; height: 14px;"></span>
-                    <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Anime Guard" style="height: 85px; width: 85px; object-fit: cover; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8));">
-                </div>
+                <!-- RECTANGULAR OVERFLOWING IMAGE -->
+                <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Anime Guard" style="position: absolute; top: -75px; left: 50%; transform: translateX(-50%); height: 110px; width: auto; border-radius: 12px; filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.8));">
                 
-                <h1 class="neon-title">Workspace</h1>
+                <h1 class="neon-title" style="margin-top: 10px;">Workspace</h1>
                 <p>Gateway to your servers</p>
                 <div class="input-group" style="margin-bottom: 0;">
                     <input type="text" id="workspaceInput" class="login-neon-input" placeholder="Login Name..." autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
