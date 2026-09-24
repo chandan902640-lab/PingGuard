@@ -68,6 +68,10 @@ async def send_telegram_alert(username: str, msg: str):
                 await client.post(tg_url, json={"chat_id": row[1], "text": f"🔴 [{username.upper()}] ALERT:\n{msg}"})
         except: pass
 
+@app.get("/api/health")
+def health_check():
+    return {"status": "online"}
+
 @app.get("/", response_class=HTMLResponse)
 def read_root():
     html = """
@@ -88,6 +92,13 @@ def read_root():
             
             @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
             @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
+
+            /* OFFLINE WARNING BANNER */
+            #offline-banner {
+                position: fixed; top: 0; left: 0; right: 0; background: #ef4444; color: white;
+                text-align: center; font-weight: 700; padding: 10px; font-size: 14px; z-index: 9999;
+                display: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5); letter-spacing: 1px;
+            }
 
             /* =========================================
                STEP 1: THE GATEWAY (NEON + GLASS LOGIN)
@@ -167,7 +178,6 @@ def read_root():
 
             .sidebar { width: 260px; padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3)); box-shadow: 15px 0 30px rgba(0,0,0,0.05); border-right: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
             
-            /* COOL LIGHTNING NEON LOGO STYLING */
             .brand { 
                 font-size: 26px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 20px; 
                 text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
@@ -175,7 +185,6 @@ def read_root():
             }
             .brand span { color: #00f2fe; text-shadow: 0 0 15px rgba(0, 242, 254, 0.9); }
             
-            /* COOL NEON USER BADGE STYLING WITH MULTI-COLOR DOT */
             .user-badge { 
                 background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,249,255,0.7)); 
                 padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 700; color: #0284c7; 
@@ -191,6 +200,20 @@ def read_root():
             .sidebar .dot-blink { margin-right: 8px; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; }
             
+            /* OFFLINE CLASS TO STOP ALL BLINKING/GLOWING */
+            .offline-mode .dot-blink, 
+            .offline-mode .live-indicator,
+            .offline-mode .login-glass-box {
+                animation: none !important;
+                background-color: #cbd5e1 !important;
+                box-shadow: none !important;
+            }
+            .offline-mode .brand span, 
+            .offline-mode .neon-title {
+                text-shadow: none !important;
+                color: #64748b !important;
+            }
+
             @keyframes rgb-blink { 
                 0% { background-color: #ff6b00; box-shadow: 0 0 10px #ff6b00; } 
                 30% { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; } 
@@ -240,10 +263,11 @@ def read_root():
         </style>
     </head>
     <body>
+        <div id="offline-banner">⚠️ WARNING: CONNECTION TO RENDER SERVER LOST - NEON LIGHTS DISABLED</div>
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- LOGIN SCREEN WITH BIGGER ANIME IMAGE -->
+        <!-- LOGIN SCREEN -->
         <div id="login-screen">
             <div class="login-glass-box">
                 <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/anime.png" alt="Anime Guard" style="position: absolute; top: -130px; left: 50%; transform: translateX(-50%); height: 200px; width: auto; border-radius: 16px; filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9));">
@@ -259,10 +283,8 @@ def read_root():
 
         <div id="app-screen">
             <div class="sidebar">
-                <!-- LIGHTNING LOGO WITH NEON GLOW -->
                 <div class="brand">⚡ Ping<span>Guard</span></div>
                 
-                <!-- USER BADGE WITH MULTI-COLOR NEON DOT -->
                 <div class="user-badge" onclick="logout()" title="Click to Logout">
                     <span class="dot-blink" style="width: 10px; height: 10px;"></span>
                     👤 <span id="displayUser"></span>
@@ -338,6 +360,22 @@ def read_root():
         <script>
             let currentUser = localStorage.getItem('pg_workspace');
             let liveChart;
+
+            // RENDER CONNECTION HEALTH CHECK HEARTBEAT
+            setInterval(async () => {
+                try {
+                    let res = await fetch('/api/health');
+                    if (res.ok) {
+                        document.body.classList.remove('offline-mode');
+                        document.getElementById('offline-banner').style.display = 'none';
+                    } else {
+                        throw new Error();
+                    }
+                } catch(e) {
+                    document.body.classList.add('offline-mode');
+                    document.getElementById('offline-banner').style.display = 'block';
+                }
+            }, 3000);
 
             function initApp() {
                 if (!currentUser) {
