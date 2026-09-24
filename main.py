@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="PingGuard White 3D Sidebar")
+app = FastAPI(title="PingGuard Ultra Glass")
 DB_NAME = "database.db"
-live_logs = ["[SYSTEM] PingGuard 3D Glass Engine Initialized..."]
+live_logs = ["[SYSTEM] PingGuard Ultra Glass Engine Initialized..."]
 
 def log_msg(text):
     live_logs.append(f"[{time.strftime('%H:%M:%S')}] {text}")
@@ -39,13 +39,13 @@ def read_root():
     jobs_list = ""
     for r in rows:
         jobs_list += f"""
-        <div class="glass-card server-item">
+        <div class="glass-item server-item">
             <div>
                 <h4>{r[1]}</h4>
                 <a href="{r[2]}" target="_blank">{r[2]}</a>
-                <p>Interval: {r[3]} mins | Status: <span style="color: #27ae60; font-weight: bold;">{r[4]}</span></p>
+                <p>Interval: {r[3]} mins | Status: <span style="color: #059669; font-weight: 700;">{r[4]}</span></p>
             </div>
-            <button class="glass-btn delete-btn" onclick="delJob({r[0]})">Delete</button>
+            <button class="delete-btn" onclick="delJob({r[0]})">Delete</button>
         </div>
         """
     
@@ -58,55 +58,83 @@ def read_root():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PingGuard | White 3D Sidebar</title>
+        <title>PingGuard | Ultra Frosted Glass</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         
         <style>
+            :root {
+                --glass-bg: rgba(255, 255, 255, 0.4);
+                --glass-border: rgba(255, 255, 255, 0.6);
+                --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+                --text-main: #1e293b;
+            }
+
             body { 
-                background: #e0e5ec; /* Safed/Grey 3D Background */
-                color: #2c3e50; 
+                /* Premium Animated Pastel Mesh Gradient Background */
+                background: linear-gradient(45deg, #e0c3fc 0%, #8ec5fc 100%);
+                background-size: 200% 200%;
+                animation: gradientBG 15s ease infinite;
+                color: var(--text-main); 
                 font-family: 'Poppins', sans-serif; 
                 margin: 0; padding: 0; 
                 display: flex; height: 100vh; overflow: hidden;
             }
             
-            /* Left Sidebar (3D Glass Look) */
+            @keyframes gradientBG {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            
+            /* The Ultimate Glass Effect */
+            .glass-panel {
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid var(--glass-border);
+                border-right: 1px solid rgba(255, 255, 255, 0.2);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: var(--glass-shadow);
+            }
+            
+            /* Left Sidebar */
             .sidebar {
                 width: 250px;
-                background: #e0e5ec;
                 padding: 30px 20px;
-                display: flex;
-                flex-direction: column;
-                box-shadow: 6px 0 15px rgba(163,177,198,0.5);
+                display: flex; flex-direction: column;
                 z-index: 10;
             }
             
             .brand {
-                font-size: 28px; font-weight: 700; color: #2c3e50;
+                font-size: 28px; font-weight: 700; color: #0f172a;
                 text-align: center; margin-bottom: 40px;
+                text-shadow: 0 2px 4px rgba(255,255,255,0.5);
             }
-            .brand span { color: #3498db; }
+            .brand span { color: #2563eb; }
             
-            /* Sidebar Buttons (Raised 3D) */
+            /* Sidebar Buttons (Frosted Pills) */
             .menu-btn {
-                background: #e0e5ec; color: #34495e;
-                border: none; border-radius: 12px;
+                background: rgba(255, 255, 255, 0.3); color: #334155;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                border-radius: 12px;
                 padding: 15px 20px; margin-bottom: 15px;
-                font-size: 16px; font-weight: 600; font-family: 'Poppins', sans-serif;
-                text-align: left; cursor: pointer; transition: all 0.2s ease;
-                box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
+                font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif;
+                text-align: left; cursor: pointer; transition: all 0.3s ease;
                 display: flex; align-items: center; gap: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             }
             
             .menu-btn:hover {
+                background: rgba(255, 255, 255, 0.6);
                 transform: translateY(-2px);
-                box-shadow: 2px 2px 5px #babecc, -2px -2px 5px #ffffff;
             }
             
-            /* Active Sidebar Button (Sunken 3D + Blue Text) */
+            /* Active Button */
             .menu-btn.active {
-                box-shadow: inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff;
-                color: #3498db;
+                background: #ffffff;
+                color: #2563eb;
+                box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 5px 15px rgba(37, 99, 235, 0.15);
+                border: 1px solid #ffffff;
             }
             
             /* Main Content Area */
@@ -114,77 +142,90 @@ def read_root():
                 flex: 1; padding: 40px; overflow-y: auto;
             }
             
-            /* Hide sections by default */
             .content-section { display: none; animation: fadeIn 0.4s ease; }
             .content-section.active { display: block; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
             
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            h2 { font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 25px; color: #0f172a; text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
             
-            h2 { font-size: 24px; font-weight: 600; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid rgba(255,255,255,0.5); padding-bottom: 15px; color: #2c3e50; }
-            
-            /* Glass Cards (Raised 3D) */
+            /* Main Cards */
             .glass-card {
-                background: #e0e5ec;
-                border: 1px solid rgba(255, 255, 255, 0.6);
-                border-radius: 20px; padding: 30px; margin-bottom: 25px;
-                box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.8);
+                border-radius: 24px; padding: 30px; margin-bottom: 25px;
             }
             
-            /* Input Fields (Sunken 3D) */
+            /* Input Fields (Glass inputs) */
             .input-group { margin-bottom: 20px; }
             input {
                 width: 100%; padding: 15px; 
-                border-radius: 12px; border: none;
-                background: #e0e5ec;
-                box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
-                color: #34495e; font-family: 'Poppins', sans-serif; font-size: 15px;
+                border-radius: 12px; 
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                background: rgba(255, 255, 255, 0.5);
+                backdrop-filter: blur(5px);
+                color: #1e293b; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 500;
                 box-sizing: border-box; outline: none; transition: 0.3s;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
             }
-            input:focus { box-shadow: inset 2px 2px 5px #babecc, inset -2px -2px 5px #ffffff; }
+            input:focus { 
+                background: rgba(255, 255, 255, 0.8); 
+                border-color: #2563eb;
+                box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            }
             
-            /* Main Buttons (Blue Raised) */
+            /* Main Buttons */
             .glass-btn {
-                width: 100%; padding: 15px; border: none; border-radius: 12px;
-                background: #3498db; color: white; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif;
-                box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
-                cursor: pointer; transition: 0.2s;
+                width: 100%; padding: 16px; border: none; border-radius: 12px;
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                color: white; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif;
+                box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+                cursor: pointer; transition: 0.3s;
             }
             .glass-btn:hover { 
-                background: #2980b9; transform: translateY(2px); 
-                box-shadow: 2px 2px 5px #babecc, -2px -2px 5px #ffffff; 
+                transform: translateY(-2px); 
+                box-shadow: 0 15px 25px rgba(37, 99, 235, 0.3); 
             }
+            
+            /* Individual Server Items inside Card */
+            .glass-item {
+                background: rgba(255, 255, 255, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                border-radius: 16px;
+                display: flex; justify-content: space-between; align-items: center; padding: 20px;
+                margin-bottom: 15px; transition: 0.3s;
+            }
+            .glass-item:hover { background: rgba(255, 255, 255, 0.7); transform: scale(1.01); }
+            
+            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #0f172a; }
+            .server-item a { color: #2563eb; text-decoration: none; font-size: 15px; font-weight: 500; }
+            .server-item a:hover { text-decoration: underline; }
+            .server-item p { margin: 8px 0 0 0; font-size: 14px; color: #475569; }
             
             .delete-btn {
-                width: auto; padding: 10px 20px; font-size: 13px;
-                background: #e74c3c;
+                background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);
+                padding: 10px 20px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.2s;
             }
-            .delete-btn:hover { background: #c0392b; }
+            .delete-btn:hover { background: #dc2626; color: #fff; }
             
-            .server-item { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
-            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #2c3e50; }
-            .server-item a { color: #3498db; text-decoration: none; font-size: 15px; font-weight: 500; }
-            .server-item a:hover { text-decoration: underline; }
-            .server-item p { margin: 8px 0 0 0; font-size: 14px; color: #7f8c8d; }
+            .empty-state { text-align: center; padding: 40px; color: #475569; font-weight: 500; }
             
-            .empty-state { text-align: center; padding: 40px; color: #7f8c8d; }
-            
-            /* Terminal/Logs (Sunken 3D) */
+            /* Terminal/Logs */
             .logs-container { 
-                background: #e0e5ec; 
-                box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff; 
-                color: #27ae60; padding: 20px; height: 350px; overflow-y: auto; 
-                border-radius: 12px; font-family: monospace; font-size: 14px; font-weight: 600; line-height: 1.6; 
+                background: rgba(15, 23, 42, 0.8); 
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #34d399; padding: 25px; height: 350px; overflow-y: auto; 
+                border-radius: 16px; font-family: monospace; font-size: 14px; font-weight: 500; line-height: 1.6; 
+                box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
             }
             
             ::-webkit-scrollbar { width: 8px; }
             ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: #babecc; border-radius: 10px; }
+            ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.8); }
         </style>
     </head>
     <body>
         
-        <!-- Left Sidebar Menu -->
-        <div class="sidebar">
+        <div class="sidebar glass-panel">
             <div class="brand">Ping<span>Guard</span></div>
             
             <button class="menu-btn active" onclick="switchTab('dashboard', this)">
@@ -198,24 +239,21 @@ def read_root():
             </button>
         </div>
 
-        <!-- Main Content Tabs -->
         <div class="main-content">
             
-            <!-- Dashboard Tab -->
             <div id="dashboard" class="content-section active">
-                <div class="glass-card">
+                <div class="glass-card glass-panel">
                     <h2>Active Infrastructures</h2>
                     <div id="jobs">REPLACE_JOBS_HTML</div>
                 </div>
             </div>
 
-            <!-- Deploy Tab -->
             <div id="deploy" class="content-section">
-                <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+                <div class="glass-card glass-panel" style="max-width: 600px; margin: 0 auto;">
                     <h2>Deploy Monitor Engine</h2>
                     <form id="form">
                         <div class="input-group">
-                            <input type="text" id="label" placeholder="Project Name (e.g. Node API)" required autocomplete="off">
+                            <input type="text" id="label" placeholder="Project Name (e.g. API Server)" required autocomplete="off">
                         </div>
                         <div class="input-group">
                             <input type="url" id="url" placeholder="https://target-server.com" required autocomplete="off">
@@ -223,14 +261,13 @@ def read_root():
                         <div class="input-group">
                             <input type="number" id="interval" value="5" placeholder="Ping Interval (Mins)" required>
                         </div>
-                        <button type="submit" class="glass-btn" id="submitBtn">Start Pinging</button>
+                        <button type="submit" class="glass-btn" id="submitBtn">Deploy Monitor</button>
                     </form>
                 </div>
             </div>
 
-            <!-- Logs Tab -->
             <div id="logs" class="content-section">
-                <div class="glass-card">
+                <div class="glass-card glass-panel">
                     <h2>Live Server Logs</h2>
                     <div id="logs-feed" class="logs-container">Awaiting connection...</div>
                 </div>
@@ -239,7 +276,6 @@ def read_root():
         </div>
 
         <script>
-            // Tab Switching Logic
             function switchTab(tabId, btnElement) {
                 document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
                 document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -248,7 +284,6 @@ def read_root():
                 btnElement.classList.add('active');
             }
 
-            // Add Server Logic
             document.getElementById('form').onsubmit = async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('submitBtn');
@@ -264,10 +299,9 @@ def read_root():
                 });
                 let data = await res.json();
                 if(data.status === 'ok') { location.reload(); }
-                else { alert(data.msg); btn.innerText = "Start Pinging"; }
+                else { alert(data.msg); btn.innerText = "Deploy Monitor"; }
             };
             
-            // Delete Server Logic
             async function delJob(id) { 
                 if(confirm("Stop monitoring this server?")) {
                     await fetch('/del/' + id, { method: 'POST' }); 
@@ -275,7 +309,6 @@ def read_root():
                 }
             }
             
-            // Fetch Logs Logic
             setInterval(async () => {
                 let res = await fetch('/logs');
                 let data = await res.json();
