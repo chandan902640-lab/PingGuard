@@ -450,45 +450,10 @@ def read_root():
                         
                         const ctx = document.getElementById('liveChart').getContext('2d');
                         if(liveChart) liveChart.destroy();
-                        
-                        // NEON SNAKE GLOWING GRAPH CONFIGURATION
                         liveChart = new Chart(ctx, {
                             type: 'line',
-                            data: { 
-                                labels: [], 
-                                datasets: [{ 
-                                    label: 'Response Time (ms)', 
-                                    data: [], 
-                                    borderColor: '#00f2fe', 
-                                    backgroundColor: 'rgba(0, 242, 254, 0.15)', 
-                                    borderWidth: 4, 
-                                    tension: 0.4, 
-                                    fill: true, 
-                                    pointBackgroundColor: '#00f2fe', 
-                                    pointBorderColor: '#ffffff',
-                                    pointBorderWidth: 2,
-                                    pointRadius: 6,
-                                    pointHoverRadius: 9
-                                }] 
-                            },
-                            options: { 
-                                responsive: true, 
-                                maintainAspectRatio: false, 
-                                plugins: {
-                                    legend: { labels: { font: { family: 'Poppins', weight: '600' } } }
-                                },
-                                scales: { 
-                                    y: { 
-                                        beginAtZero: true, 
-                                        grid: { color: 'rgba(0,0,0,0.04)' },
-                                        ticks: { font: { family: 'Poppins' } }
-                                    }, 
-                                    x: { 
-                                        grid: { display: false },
-                                        ticks: { font: { family: 'Poppins' } }
-                                    } 
-                                } 
-                            }
+                            data: { labels: [], datasets: [{ label: 'Response Time (ms)', data: [], borderColor: '#00f2fe', backgroundColor: 'rgba(0, 242, 254, 0.15)', borderWidth: 4, tension: 0.4, fill: true, pointBackgroundColor: '#00f2fe', pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 6 }] },
+                            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' } }, x: { grid: { display: false } } } }
                         });
                         
                         fetchData();
@@ -674,23 +639,26 @@ def update_settings(s: SettingsData, x_user: str = Header("default")):
     sync_db_to_github(f"Update settings for {x_user}")
     return {"status": "ok"}
 
+# SMART BATCHED & STAGGERED PINGER (Load Reduction Optimization)
 async def pinger():
     while True:
-        await asyncio.sleep(30)
+        # Har 10 seconds mein chote batches mein check karega taaki CPU par load na aaye
+        await asyncio.sleep(10)
         try:
             conn = sqlite3.connect(DB_NAME)
             cursor = conn.cursor()
             cursor.execute("SELECT id, username, label, url, total_pings, fail_count FROM jobs")
             rows = cursor.fetchall()
+            conn.close()
             
             if rows:
                 async with httpx.AsyncClient(timeout=10) as client:
                     for r in rows:
                         jid, uname, label, url, total_pings, fail_count = r
-                        new_total = total_pings + 1
-                        success = False
                         
+                        # Har server ko ek-ek karke thode gap par ping karenge taaki spike na aaye
                         start_time = time.time()
+                        success = False
                         try:
                             resp = await client.get(url)
                             if resp.status_code == 200:
@@ -707,13 +675,21 @@ async def pinger():
                             user_graphs[uname] = {"labels": [], "data": []}
                         user_graphs[uname]["data"].append(resp_time)
                         
+                        new_total = total_pings + 1
                         new_fail = fail_count if success else fail_count + 1
-                        cursor.execute("UPDATE jobs SET total_pings=?, fail_count=? WHERE id=?", (new_total, new_fail, jid))
-                        conn.commit()
+                        
+                        # Database update
+                        conn_update = sqlite3.connect(DB_NAME)
+                        cur_update = conn_update.cursor()
+                        cur_update.execute("UPDATE jobs SET total_pings=?, fail_count=? WHERE id=?", (new_total, new_fail, jid))
+                        conn_update.commit()
+                        conn_update.close()
                         
                         if not success:
                             await send_telegram_alert(uname, f"Server '{label}' ({url}) is NOT responding!")
-            conn.close()
+                            
+                        # Thoda sa delay har request ke beech mein taaki server par load bilkul zero rahe
+                        await asyncio.sleep(2)
         except Exception:
             pass
 
