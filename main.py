@@ -3,6 +3,8 @@ import asyncio
 import httpx
 import time
 import random
+import os
+import base64
 from fastapi import FastAPI, Header
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -10,9 +12,60 @@ from typing import Optional
 
 app = FastAPI(title="PingGuard Multi-User 3D")
 DB_NAME = "database.db"
+GH_TOKEN = os.getenv("GH_TOKEN", "")
+GH_REPO = "chandan902640-lab/PingGuard" # Aapka GitHub repo naam
 
 user_logs = {}
 user_graphs = {}
+
+# GitHub se database download karne ka function (Startup par)
+def sync_db_from_github():
+    if not GH_TOKEN:
+        return
+    try:
+        url = f"https://api.github.com/repos/{GH_REPO}/contents/{DB_NAME}"
+        headers = {"Authorization": f"Bearer {GH_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+        resp = httpx.get(url, headers=headers)
+        if resp.status_code == 200:
+            content_b64 = resp.json().get("content", "")
+            file_bytes = base64.b64decode(content_b64)
+            with open(DB_NAME, "wb") as f:
+                f.write(file_bytes)
+            print("[SYNC] Database downloaded successfully from GitHub.")
+    except Exception as e:
+        print(f"[SYNC ERROR] Failed to pull DB from GitHub: {e}")
+
+# GitHub par database upload/update karne ka function (Changes ke baad)
+def sync_db_to_github(commit_msg="Auto-sync database"):
+    if not GH_TOKEN:
+        return
+    try:
+        url = f"https://api.github.com/repos/{GH_REPO}/contents/{DB_NAME}"
+        headers = {"Authorization": f"Bearer {GH_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+        
+        # Pehle file ka sha (version) nikalna padta hai update karne ke liye
+        get_resp = httpx.get(url, headers=headers)
+        sha = get_resp.json().get("sha") if get_resp.status_code == 200 else None
+        
+        with open(DB_NAME, "rb") as f:
+            encoded_content = base64.b64encode(f.read()).decode("utf-8")
+            
+        payload = {
+            "message": commit_msg,
+            "content": encoded_content,
+            "branch": "main"
+        }
+        if sha:
+            payload["sha"] = sha
+            
+        put_resp = httpx.put(url, headers=headers, json=payload)
+        if put_resp.status_code in [200, 201]:
+            print("[SYNC] Database pushed successfully to GitHub.")
+    except Exception as e:
+        print(f"[SYNC ERROR] Failed to push DB to GitHub: {e}")
+
+# Startup par sabse pehle GitHub se DB khichenge
+sync_db_from_github()
 
 def log_msg(username, text):
     if username not in user_logs:
@@ -93,16 +146,12 @@ def read_root():
             @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
             @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
 
-            /* OFFLINE WARNING BANNER */
             #offline-banner {
                 position: fixed; top: 0; left: 0; right: 0; background: #ef4444; color: white;
                 text-align: center; font-weight: 700; padding: 10px; font-size: 14px; z-index: 9999;
                 display: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5); letter-spacing: 1px;
             }
 
-            /* =========================================
-               STEP 1: THE GATEWAY (NEON + GLASS LOGIN)
-               ========================================= */
             #login-screen { 
                 position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; 
                 z-index: 1000; 
@@ -161,9 +210,6 @@ def read_root():
             .login-glass-btn:hover { box-shadow: 12px 12px 25px rgba(0, 242, 254, 0.6), -12px -12px 25px rgba(255, 255, 255, 1); transform: translateY(-2px); }
             .login-glass-btn:active { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.15), inset -6px -6px 12px rgba(255,255,255,0.5); transform: translateY(3px); }
 
-            /* =========================================
-               REST OF THE APP UI
-               ========================================= */
             .neon-input { width: 100%; padding: 18px 25px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.6); background: #eef2f6; color: #0f172a; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; box-sizing: border-box; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: inset 6px 6px 12px #cbd5e1, inset -6px -6px 12px #ffffff; }
             .neon-input:focus { background: #ffffff; border-color: #00f2fe; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 20px rgba(0, 242, 254, 0.5), 0 0 5px #00f2fe; }
             select.neon-input { cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%233b82f6" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position: right 20px top 50%; }
@@ -200,7 +246,6 @@ def read_root():
             .sidebar .dot-blink { margin-right: 8px; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; }
             
-            /* OFFLINE CLASS TO STOP ALL BLINKING/GLOWING */
             .offline-mode .dot-blink, 
             .offline-mode .live-indicator,
             .offline-mode .login-glass-box {
@@ -267,7 +312,6 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- LOGIN SCREEN -->
         <div id="login-screen">
             <div class="login-glass-box">
                 <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/anime.png" alt="Anime Guard" style="position: absolute; top: -130px; left: 50%; transform: translateX(-50%); height: 200px; width: auto; border-radius: 16px; filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9));">
@@ -361,7 +405,6 @@ def read_root():
             let currentUser = localStorage.getItem('pg_workspace');
             let liveChart;
 
-            // RENDER CONNECTION HEALTH CHECK HEARTBEAT
             setInterval(async () => {
                 try {
                     let res = await fetch('/api/health');
@@ -554,6 +597,7 @@ def save_job(job: JobData, x_user: str = Header("default")):
         log_msg(x_user, f"Deployed New Monitor: {job.label}")
     conn.commit()
     conn.close()
+    sync_db_to_github(f"Update job for {x_user}")
     return {"status": "ok"}
 
 @app.post("/api/del/{jid}")
@@ -564,6 +608,7 @@ def del_job(jid: int, x_user: str = Header("default")):
     conn.commit()
     conn.close()
     log_msg(x_user, f"Deleted Monitor ID: {jid}")
+    sync_db_to_github(f"Delete job {jid} for {x_user}")
     return {"status": "ok"}
 
 @app.post("/api/settings")
@@ -577,6 +622,7 @@ def update_settings(s: SettingsData, x_user: str = Header("default")):
         cursor.execute("INSERT INTO settings (username, tg_token, tg_chat) VALUES (?, ?, ?)", (x_user, s.tg_token, s.tg_chat))
     conn.commit()
     conn.close()
+    sync_db_to_github(f"Update settings for {x_user}")
     return {"status": "ok"}
 
 async def pinger():
