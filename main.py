@@ -166,20 +166,36 @@ def read_root():
             .glass-btn:active { box-shadow: inset 6px 6px 12px rgba(0,0,0,0.1), inset -6px -6px 12px rgba(255,255,255,0.5); transform: translateY(3px); }
 
             .sidebar { width: 260px; padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3)); box-shadow: 15px 0 30px rgba(0,0,0,0.05); border-right: 1px solid rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); }
-            .brand { font-size: 26px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 20px; }
-            .brand span { color: #3b82f6; }
-            .user-badge { background: #fff; padding: 8px 15px; border-radius: 30px; font-size: 12px; font-weight: 700; color: #10b981; text-align: center; margin-bottom: 40px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05); cursor:pointer;}
-            .user-badge:hover { background: #fee2e2; color: #ef4444; }
+            
+            /* COOL LIGHTNING NEON LOGO STYLING */
+            .brand { 
+                font-size: 26px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 20px; 
+                text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
+                letter-spacing: 0.5px;
+            }
+            .brand span { color: #00f2fe; text-shadow: 0 0 15px rgba(0, 242, 254, 0.9); }
+            
+            /* COOL NEON USER BADGE STYLING WITH MULTI-COLOR DOT */
+            .user-badge { 
+                background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,249,255,0.7)); 
+                padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 700; color: #0284c7; 
+                text-align: center; margin-bottom: 40px; 
+                box-shadow: 5px 5px 15px rgba(0,0,0,0.05), -5px -5px 15px rgba(255,255,255,0.9), inset 2px 2px 5px rgba(255,255,255,1); 
+                cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+                border: 1px solid rgba(0, 242, 254, 0.4);
+                transition: 0.3s;
+            }
+            .user-badge:hover { background: #fee2e2; color: #ef4444; border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
 
             .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; animation: rgb-blink 5s infinite; }
             .sidebar .dot-blink { margin-right: 8px; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; }
             
             @keyframes rgb-blink { 
-                0% { background-color: #ff6b00; box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); } 8% { box-shadow: 0 0 0 8px rgba(255, 107, 0, 0); }
-                30% { background-color: #00ff00; box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.8); } 38% { box-shadow: 0 0 0 8px rgba(0, 255, 0, 0); }
-                60% { background-color: #00e5ff; box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.8); } 68% { box-shadow: 0 0 0 8px rgba(0, 229, 255, 0); }
-                100% { background-color: #ff6b00; box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); } 
+                0% { background-color: #ff6b00; box-shadow: 0 0 10px #ff6b00; } 
+                30% { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; } 
+                60% { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff; } 
+                100% { background-color: #ff6b00; box-shadow: 0 0 10px #ff6b00; } 
             }
 
             .menu-btn { background: rgba(230, 240, 250, 0.5); color: #334155; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 15px; padding: 15px; margin-bottom: 12px; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; box-shadow: 4px 4px 10px rgba(0,0,0,0.03), -4px -4px 10px rgba(255,255,255,0.8); }
@@ -243,8 +259,14 @@ def read_root():
 
         <div id="app-screen">
             <div class="sidebar">
-                <div class="brand">Ping<span>Guard</span></div>
-                <div class="user-badge" onclick="logout()" title="Click to Logout">👤 <span id="displayUser"></span></div>
+                <!-- LIGHTNING LOGO WITH NEON GLOW -->
+                <div class="brand">⚡ Ping<span>Guard</span></div>
+                
+                <!-- USER BADGE WITH MULTI-COLOR NEON DOT -->
+                <div class="user-badge" onclick="logout()" title="Click to Logout">
+                    <span class="dot-blink" style="width: 10px; height: 10px;"></span>
+                    👤 <span id="displayUser"></span>
+                </div>
                 
                 <button class="menu-btn active" onclick="switchTab('dashboard', this)"><span class="dot-blink dot-1"></span> Active Monitors</button>
                 <button class="menu-btn" onclick="switchTab('analytics', this)"><span class="dot-blink dot-2"></span> Network Graph</button>
