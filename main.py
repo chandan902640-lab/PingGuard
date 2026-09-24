@@ -230,7 +230,7 @@ def read_root():
         <!-- LOGIN SCREEN WITH BIGGER ANIME IMAGE -->
         <div id="login-screen">
             <div class="login-glass-box">
-                <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/anime.png" alt="Anime Guard" style="position: absolute; top: -100px; left: 50%; transform: translateX(-50%); height: 155px; width: auto; border-radius: 16px; filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9));">
+                <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/anime.png" alt="Anime Guard" style="position: absolute; top: -130px; left: 50%; transform: translateX(-50%); height: 200px; width: auto; border-radius: 16px; filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.9));">
                 
                 <h1 class="neon-title" style="margin-top: 15px;">Workspace</h1>
                 <p>Gateway to your servers</p>
