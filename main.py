@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="PingGuard White Glass")
+app = FastAPI(title="PingGuard RGB Glass")
 DB_NAME = "database.db"
-live_logs = ["[SYSTEM] PingGuard White Glass Engine Initialized..."]
+live_logs = ["[SYSTEM] PingGuard RGB Glass Engine Initialized..."]
 
 def log_msg(text):
     live_logs.append(f"[{time.strftime('%H:%M:%S')}] {text}")
@@ -58,7 +58,7 @@ def read_root():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PingGuard | White Frosted Glass</title>
+        <title>PingGuard | RGB White Glass</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         
         <style>
@@ -119,31 +119,41 @@ def read_root():
             }
             .brand span { color: #3b82f6; }
             
-            /* Blinking Pulse Dots */
+            /* Chatakdar Multi-Color RGB Blinking Dots */
             .dot-blink { 
-                width: 10px; height: 10px; border-radius: 50%; 
-                display: inline-block; margin-right: 2px;
+                width: 12px; height: 12px; border-radius: 50%; 
+                display: inline-block; margin-right: 6px;
+                animation: rgb-blink 5s infinite;
             }
             
-            .dot-green { background-color: #10b981; animation: pulse-green 2s infinite; }
-            @keyframes pulse-green { 
-                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 
-                70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 
-                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
-            }
+            /* Teeno dots ki timing thodi aage-peeche ki hai taaki mast lage */
+            .dot-1 { animation-delay: 0s; }
+            .dot-2 { animation-delay: 1.5s; }
+            .dot-3 { animation-delay: 3s; }
             
-            .dot-blue { background-color: #3b82f6; animation: pulse-blue 2s infinite; animation-delay: 0.4s; }
-            @keyframes pulse-blue { 
-                0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6); } 
-                70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); } 
-                100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } 
-            }
-            
-            .dot-purple { background-color: #8b5cf6; animation: pulse-purple 2s infinite; animation-delay: 0.8s; }
-            @keyframes pulse-purple { 
-                0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6); } 
-                70% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); } 
-                100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); } 
+            @keyframes rgb-blink { 
+                /* Orange */
+                0% { background-color: #ff6b00; box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); } 
+                8% { box-shadow: 0 0 0 8px rgba(255, 107, 0, 0); }
+                
+                /* Green */
+                20% { background-color: #00ff00; box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.8); } 
+                28% { box-shadow: 0 0 0 8px rgba(0, 255, 0, 0); }
+                
+                /* Red */
+                40% { background-color: #ff003c; box-shadow: 0 0 0 0 rgba(255, 0, 60, 0.8); } 
+                48% { box-shadow: 0 0 0 8px rgba(255, 0, 60, 0); }
+                
+                /* Yellow */
+                60% { background-color: #ffea00; box-shadow: 0 0 0 0 rgba(255, 234, 0, 0.8); } 
+                68% { box-shadow: 0 0 0 8px rgba(255, 234, 0, 0); }
+                
+                /* Asmani (Cyan) */
+                80% { background-color: #00e5ff; box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.8); } 
+                88% { box-shadow: 0 0 0 8px rgba(0, 229, 255, 0); }
+                
+                /* Wapas Orange */
+                100% { background-color: #ff6b00; box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.8); } 
             }
 
             /* Sidebar Buttons */
@@ -263,15 +273,15 @@ def read_root():
         <div class="sidebar glass-panel">
             <div class="brand">Ping<span>Guard</span></div>
             
-            <!-- Removed Emojis, Added Blinking Dots -->
+            <!-- CHATAKDAR MULTI-COLOR DOTS -->
             <button class="menu-btn active" onclick="switchTab('dashboard', this)">
-                <span class="dot-blink dot-green"></span> Active Monitors
+                <span class="dot-blink dot-1"></span> Active Monitors
             </button>
             <button class="menu-btn" onclick="switchTab('deploy', this)">
-                <span class="dot-blink dot-blue"></span> Deploy New
+                <span class="dot-blink dot-2"></span> Deploy New
             </button>
             <button class="menu-btn" onclick="switchTab('logs', this)">
-                <span class="dot-blink dot-purple"></span> System Terminal
+                <span class="dot-blink dot-3"></span> System Terminal
             </button>
         </div>
 
