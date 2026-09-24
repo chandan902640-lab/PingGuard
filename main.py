@@ -229,10 +229,13 @@ def read_root():
         <!-- NEW UPDATED LOGIN SCREEN -->
         <div id="login-screen">
             <div class="login-glass-box">
-                <!-- Multi-Colour Blinker integrated with Shield -->
-                <div style="font-size: 40px; margin-bottom: 5px; text-shadow: 0 0 20px rgba(0, 242, 254, 0.8);">
-                    <span class="dot-blink" style="width: 16px; height: 16px; margin-right: 12px; vertical-align: middle;"></span>🛡️
+                
+                <!-- AAPKI UPLOAD KI GAYI GITHUB IMAGE YAHAN HAI -->
+                <div style="margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 15px;">
+                    <span class="dot-blink" style="width: 16px; height: 16px;"></span>
+                    <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Guard Logo" style="height: 60px; filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8));">
                 </div>
+                
                 <h1 class="neon-title">Workspace</h1>
                 <p>Gateway to your servers</p>
                 <div class="input-group" style="margin-bottom: 0;">
