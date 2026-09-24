@@ -6,9 +6,9 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="PingGuard True Glass")
+app = FastAPI(title="PingGuard White Glass")
 DB_NAME = "database.db"
-live_logs = ["[SYSTEM] PingGuard True Glass Engine Initialized..."]
+live_logs = ["[SYSTEM] PingGuard White Glass Engine Initialized..."]
 
 def log_msg(text):
     live_logs.append(f"[{time.strftime('%H:%M:%S')}] {text}")
@@ -43,7 +43,7 @@ def read_root():
             <div>
                 <h4>{r[1]}</h4>
                 <a href="{r[2]}" target="_blank">{r[2]}</a>
-                <p>Interval: {r[3]} mins | Status: <span style="color: #00ffcc; font-weight: 700; text-shadow: 0 0 5px rgba(0,255,204,0.5);">{r[4]}</span></p>
+                <p>Interval: {r[3]} mins | Status: <span style="color: #059669; font-weight: 700;">{r[4]}</span></p>
             </div>
             <button class="delete-btn" onclick="delJob({r[0]})">Delete</button>
         </div>
@@ -58,47 +58,50 @@ def read_root():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PingGuard | True Frosted Glass</title>
+        <title>PingGuard | White Frosted Glass</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         
         <style>
             body { 
-                background: #0f172a; /* Dark background so colors pop */
-                color: #ffffff; 
+                background: #f1f5f9; /* Off-white / light slate base */
+                color: #1e293b; 
                 font-family: 'Poppins', sans-serif; 
                 margin: 0; padding: 0; 
                 display: flex; height: 100vh; overflow: hidden;
                 position: relative;
             }
             
-            /* Background Floating Animated Blobs for true glass effect */
+            /* Light Pastel Floating Blobs for Glass Blur Effect */
             .blob-1 {
                 position: absolute; top: -10%; left: -10%; width: 500px; height: 500px;
-                background: #ff007f; border-radius: 50%; filter: blur(80px); opacity: 0.6; z-index: -1;
-                animation: float1 12s infinite alternate ease-in-out;
+                background: #bae6fd; /* Light Blue */ 
+                border-radius: 50%; filter: blur(80px); opacity: 0.8; z-index: -1;
+                animation: float1 15s infinite alternate ease-in-out;
             }
             .blob-2 {
                 position: absolute; bottom: -20%; right: -10%; width: 600px; height: 600px;
-                background: #00f2fe; border-radius: 50%; filter: blur(100px); opacity: 0.5; z-index: -1;
-                animation: float2 15s infinite alternate ease-in-out;
+                background: #e9d5ff; /* Light Purple/Pink */
+                border-radius: 50%; filter: blur(100px); opacity: 0.7; z-index: -1;
+                animation: float2 18s infinite alternate ease-in-out;
             }
             .blob-3 {
                 position: absolute; top: 30%; left: 30%; width: 400px; height: 400px;
-                background: #7b2cbf; border-radius: 50%; filter: blur(90px); opacity: 0.6; z-index: -1;
-                animation: float3 18s infinite alternate ease-in-out;
+                background: #fef08a; /* Light Yellow */
+                border-radius: 50%; filter: blur(90px); opacity: 0.6; z-index: -1;
+                animation: float3 20s infinite alternate ease-in-out;
             }
             
             @keyframes float1 { 0% { transform: translate(0, 0); } 100% { transform: translate(100px, 100px); } }
             @keyframes float2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-150px, -100px); } }
             @keyframes float3 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(100px, -50px) scale(1.2); } }
 
-            /* TRUE Glassmorphism Class */
+            /* TRUE White Glassmorphism */
             .glass-panel {
-                background: rgba(255, 255, 255, 0.03) !important; /* Ekdum highly transparent */
-                backdrop-filter: blur(25px) saturate(150%) !important; /* Strong Blur */
-                -webkit-backdrop-filter: blur(25px) saturate(150%) !important;
-                border: 1px solid rgba(255, 255, 255, 0.15) !important; /* White border for glass edge */
-                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+                background: rgba(255, 255, 255, 0.65) !important;
+                backdrop-filter: blur(24px) saturate(120%) !important;
+                -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.9) !important;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
             }
             
             /* Left Sidebar */
@@ -107,39 +110,37 @@ def read_root():
                 padding: 30px 20px;
                 display: flex; flex-direction: column;
                 z-index: 10;
-                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                border-right: 1px solid rgba(255, 255, 255, 0.6);
             }
             
             .brand {
-                font-size: 28px; font-weight: 700; color: #ffffff;
+                font-size: 28px; font-weight: 700; color: #0f172a;
                 text-align: center; margin-bottom: 40px;
-                text-shadow: 0 2px 10px rgba(0, 242, 254, 0.5);
             }
-            .brand span { color: #00f2fe; }
+            .brand span { color: #3b82f6; }
             
-            /* Sidebar Buttons (Frosted Pills) */
+            /* Sidebar Buttons */
             .menu-btn {
-                background: rgba(255, 255, 255, 0.05); color: #e2e8f0;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.4); color: #334155;
+                border: 1px solid rgba(255, 255, 255, 0.8);
                 border-radius: 12px;
                 padding: 15px 20px; margin-bottom: 15px;
-                font-size: 15px; font-weight: 500; font-family: 'Poppins', sans-serif;
+                font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif;
                 text-align: left; cursor: pointer; transition: all 0.3s ease;
                 display: flex; align-items: center; gap: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.02);
             }
             
             .menu-btn:hover {
-                background: rgba(255, 255, 255, 0.15);
+                background: rgba(255, 255, 255, 0.8);
                 transform: translateX(5px);
             }
             
-            /* Active Button */
             .menu-btn.active {
-                background: rgba(255, 255, 255, 0.2);
-                color: #ffffff;
-                border: 1px solid rgba(255, 255, 255, 0.4);
-                box-shadow: 0 0 15px rgba(255,255,255,0.1);
-                font-weight: 600;
+                background: #ffffff;
+                color: #2563eb;
+                border: 1px solid #ffffff;
+                box-shadow: 0 5px 15px rgba(37, 99, 235, 0.1);
             }
             
             /* Main Content Area */
@@ -151,83 +152,86 @@ def read_root():
             .content-section.active { display: block; }
             @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
             
-            h2 { font-size: 26px; font-weight: 600; margin-top: 0; margin-bottom: 25px; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;}
+            h2 { font-size: 26px; font-weight: 600; margin-top: 0; margin-bottom: 25px; color: #0f172a; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 15px;}
             
             /* Main Cards */
             .glass-card {
                 border-radius: 24px; padding: 35px; margin-bottom: 25px;
             }
             
-            /* Input Fields (Glass inputs) */
+            /* Input Fields */
             .input-group { margin-bottom: 20px; }
             input {
                 width: 100%; padding: 15px 20px; 
                 border-radius: 12px; 
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                background: rgba(0, 0, 0, 0.2);
-                color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.9);
+                background: rgba(255, 255, 255, 0.5);
+                color: #0f172a; font-family: 'Poppins', sans-serif; font-size: 15px;
                 box-sizing: border-box; outline: none; transition: 0.3s;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
             }
             input::placeholder { color: #94a3b8; }
             input:focus { 
-                background: rgba(0, 0, 0, 0.4); 
-                border-color: #00f2fe;
-                box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+                background: rgba(255, 255, 255, 0.9); 
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
             }
             
             /* Main Buttons */
             .glass-btn {
                 width: 100%; padding: 16px; border: none; border-radius: 12px;
-                background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-                color: #0f172a; font-weight: 700; font-size: 16px; font-family: 'Poppins', sans-serif;
-                box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
-                cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                color: #ffffff; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif;
+                box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+                cursor: pointer; transition: 0.3s;
             }
             .glass-btn:hover { 
                 transform: translateY(-2px); 
-                box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4); 
+                box-shadow: 0 15px 25px rgba(37, 99, 235, 0.3); 
             }
             
             /* Individual Server Items */
             .glass-item {
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.9);
                 border-radius: 16px;
                 display: flex; justify-content: space-between; align-items: center; padding: 20px;
                 margin-bottom: 15px; transition: 0.3s;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             }
-            .glass-item:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.3); }
+            .glass-item:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
             
-            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #ffffff; }
-            .server-item a { color: #00f2fe; text-decoration: none; font-size: 15px; }
-            .server-item a:hover { text-shadow: 0 0 8px rgba(0,242,254,0.5); }
-            .server-item p { margin: 8px 0 0 0; font-size: 14px; color: #cbd5e1; }
+            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #0f172a; }
+            .server-item a { color: #3b82f6; text-decoration: none; font-size: 15px; }
+            .server-item a:hover { text-decoration: underline; }
+            .server-item p { margin: 8px 0 0 0; font-size: 14px; color: #64748b; }
             
             .delete-btn {
-                background: rgba(255, 0, 127, 0.1); color: #ff007f; border: 1px solid rgba(255, 0, 127, 0.3);
+                background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);
                 padding: 10px 20px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s;
             }
-            .delete-btn:hover { background: #ff007f; color: #fff; box-shadow: 0 0 15px rgba(255,0,127,0.4); }
+            .delete-btn:hover { background: #ef4444; color: #fff; }
             
-            .empty-state { text-align: center; padding: 40px; color: #94a3b8; font-weight: 400; border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; }
+            .empty-state { text-align: center; padding: 40px; color: #64748b; font-weight: 500; }
             
             /* Terminal/Logs */
             .logs-container { 
-                background: rgba(0, 0, 0, 0.4); 
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                color: #00ffcc; padding: 25px; height: 350px; overflow-y: auto; 
-                border-radius: 16px; font-family: monospace; font-size: 14px; line-height: 1.6; 
+                background: rgba(255, 255, 255, 0.7); 
+                border: 1px solid rgba(255, 255, 255, 0.9);
+                color: #059669; padding: 25px; height: 350px; overflow-y: auto; 
+                border-radius: 16px; font-family: monospace; font-size: 14px; line-height: 1.6;
+                box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
             }
             
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-            ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+            ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
         </style>
     </head>
     <body>
         
-        <!-- Animated Background Blobs -->
+        <!-- Faint Animated Pastel Blobs for Glass Effect -->
         <div class="blob-1"></div>
         <div class="blob-2"></div>
         <div class="blob-3"></div>
@@ -268,14 +272,14 @@ def read_root():
                         <div class="input-group">
                             <input type="number" id="interval" value="5" placeholder="Ping Interval (Mins)" required>
                         </div>
-                        <button type="submit" class="glass-btn" id="submitBtn">Initialize Monitor</button>
+                        <button type="submit" class="glass-btn" id="submitBtn">Start Pinging</button>
                     </form>
                 </div>
             </div>
 
             <div id="logs" class="content-section">
                 <div class="glass-card glass-panel">
-                    <h2>Live Server Feed</h2>
+                    <h2>Live Server Logs</h2>
                     <div id="logs-feed" class="logs-container">Awaiting connection...</div>
                 </div>
             </div>
@@ -306,7 +310,7 @@ def read_root():
                 });
                 let data = await res.json();
                 if(data.status === 'ok') { location.reload(); }
-                else { alert(data.msg); btn.innerText = "Initialize Monitor"; }
+                else { alert(data.msg); btn.innerText = "Start Pinging"; }
             };
             
             async function delJob(id) { 
