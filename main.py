@@ -16,7 +16,6 @@ def log_msg(text):
     live_logs.append(f"[{timestamp}] {text}")
     if len(live_logs) > 50: live_logs.pop(0)
     
-    # Update graph data
     graph_data["labels"].append(timestamp)
     if len(graph_data["labels"]) > 15:
         graph_data["labels"].pop(0)
@@ -25,16 +24,13 @@ def log_msg(text):
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Jobs table update (Added stats)
     cursor.execute('''CREATE TABLE IF NOT EXISTS jobs (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         label TEXT, url TEXT, interval INTEGER, status TEXT DEFAULT 'Active',
         total_pings INTEGER DEFAULT 0, fail_count INTEGER DEFAULT 0)''')
-    # Settings table for Telegram
     cursor.execute('''CREATE TABLE IF NOT EXISTS settings (
         id INTEGER PRIMARY KEY, tg_token TEXT, tg_chat TEXT)''')
     
-    # Insert default settings row if empty
     cursor.execute("SELECT id FROM settings WHERE id=1")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO settings (id, tg_token, tg_chat) VALUES (1, '', '')")
@@ -88,29 +84,32 @@ def read_root():
         fails = r[6]
         uptime_pct = 100.0 if total == 0 else round(((total - fails) / total) * 100, 2)
         
+        # NEON STATS CARD HTML
         jobs_list += f"""
         <div class="glass-item server-item">
             <div style="width: 100%;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <div>
-                        <h4>{r[1]}</h4>
-                        <a href="{r[2]}" target="_blank">{r[2]}</a>
+                        <h4 style="display: flex; align-items: center; gap: 8px; margin: 0 0 5px 0;">
+                            <span class="live-indicator"></span> {r[1]}
+                        </h4>
+                        <a href="{r[2]}" target="_blank" style="margin-left: 18px;">{r[2]}</a>
                     </div>
-                    <button class="delete-btn" onclick="delJob({r[0]})">Delete</button>
+                    <button class="neon-delete-btn" onclick="delJob({r[0]})">Delete</button>
                 </div>
                 
                 <div class="stats-grid">
-                    <div class="stat-box">
+                    <div class="stat-box neon-box-blue">
                         <div class="stat-label">Total Pings</div>
-                        <div class="stat-val" style="color: #3b82f6;">{total}</div>
+                        <div class="stat-val">{total}</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box neon-box-green">
                         <div class="stat-label">Uptime</div>
-                        <div class="stat-val" style="color: #10b981; text-shadow: 0 0 8px rgba(16,185,129,0.4);">{uptime_pct}%</div>
+                        <div class="stat-val">{uptime_pct}%</div>
                     </div>
-                    <div class="stat-box">
+                    <div class="stat-box neon-box-red">
                         <div class="stat-label">Failures</div>
-                        <div class="stat-val" style="color: #ef4444;">{fails}</div>
+                        <div class="stat-val">{fails}</div>
                     </div>
                 </div>
             </div>
@@ -128,7 +127,6 @@ def read_root():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>PingGuard | Ultimate RGB Glass</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <!-- Chart.js for Live Graph -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         
         <style>
@@ -137,7 +135,6 @@ def read_root():
                 margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; position: relative;
             }
             
-            /* Animated Blobs */
             .blob-1 { position: absolute; top: -10%; left: -10%; width: 500px; height: 500px; background: #bae6fd; border-radius: 50%; filter: blur(80px); opacity: 0.8; z-index: -1; animation: float1 15s infinite alternate ease-in-out; }
             .blob-2 { position: absolute; bottom: -20%; right: -10%; width: 600px; height: 600px; background: #e9d5ff; border-radius: 50%; filter: blur(100px); opacity: 0.7; z-index: -1; animation: float2 18s infinite alternate ease-in-out; }
             .blob-3 { position: absolute; top: 30%; left: 30%; width: 400px; height: 400px; background: #fef08a; border-radius: 50%; filter: blur(90px); opacity: 0.6; z-index: -1; animation: float3 20s infinite alternate ease-in-out; }
@@ -152,12 +149,11 @@ def read_root():
                 box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
             }
             
-            /* Sidebar */
             .sidebar { width: 260px; padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; border-right: 1px solid rgba(255, 255, 255, 0.6); }
             .brand { font-size: 28px; font-weight: 700; color: #0f172a; text-align: center; margin-bottom: 40px; }
             .brand span { color: #3b82f6; }
             
-            /* RGB Blinking Dots */
+            /* Sidebar RGB Blinking Dots */
             .dot-blink { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; animation: rgb-blink 5s infinite; }
             .dot-1 { animation-delay: 0s; } .dot-2 { animation-delay: 1s; } .dot-3 { animation-delay: 2s; } .dot-4 { animation-delay: 3s; } .dot-5 { animation-delay: 4s; }
             
@@ -201,22 +197,40 @@ def read_root():
             }
             .glass-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(37, 99, 235, 0.3); }
             
+            /* NEON SERVER CARD STYLES */
             .glass-item {
-                background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px;
-                display: flex; flex-direction: column; padding: 20px; margin-bottom: 20px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+                background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 16px;
+                display: flex; flex-direction: column; padding: 25px; margin-bottom: 25px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             }
-            .glass-item:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+            .glass-item:hover { background: #ffffff; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
             
-            .server-item h4 { margin: 0 0 5px 0; font-size: 18px; color: #0f172a; }
-            .server-item a { color: #3b82f6; text-decoration: none; font-size: 14px; }
+            /* Server Title & Live Blinker */
+            .server-item h4 { font-size: 20px; color: #0f172a; }
+            .live-indicator { width: 10px; height: 10px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #10b981; animation: live-pulse 1.5s infinite; }
+            @keyframes live-pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
             
-            .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 10px; }
-            .stat-box { background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); border-radius: 10px; padding: 12px; text-align: center; }
-            .stat-label { font-size: 12px; color: #64748b; font-weight: 500; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
-            .stat-val { font-size: 20px; font-weight: 700; }
+            .server-item a { color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500; }
+            .server-item a:hover { text-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
             
-            .delete-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 15px; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-            .delete-btn:hover { background: #ef4444; color: #fff; }
+            /* Neon Stats Grid */
+            .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px; }
+            .stat-box { background: rgba(255,255,255,0.8); border-radius: 12px; padding: 15px; text-align: center; transition: 0.3s; }
+            .stat-label { font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+            .stat-val { font-size: 24px; font-weight: 700; }
+            
+            /* Individual Neon Glows */
+            .neon-box-blue { border: 1px solid rgba(59, 130, 246, 0.4); box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.1), 0 4px 10px rgba(59, 130, 246, 0.1); }
+            .neon-box-blue .stat-val { color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+            
+            .neon-box-green { border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.1), 0 4px 10px rgba(16, 185, 129, 0.1); }
+            .neon-box-green .stat-val { color: #10b981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+            
+            .neon-box-red { border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.1), 0 4px 10px rgba(239, 68, 68, 0.1); }
+            .neon-box-red .stat-val { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            
+            /* Neon Delete Button */
+            .neon-delete-btn { background: rgba(239, 68, 68, 0.05); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); padding: 8px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(239, 68, 68, 0.1); }
+            .neon-delete-btn:hover { background: #ef4444; color: #fff; box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
             
             .logs-container { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.9); color: #059669; padding: 20px; height: 350px; overflow-y: auto; border-radius: 16px; font-family: monospace; font-size: 13px; line-height: 1.6; }
             .chart-container { height: 350px; width: 100%; }
@@ -240,7 +254,6 @@ def read_root():
 
         <div class="main-content">
             
-            <!-- Dashboard Tab -->
             <div id="dashboard" class="content-section active">
                 <div class="glass-card glass-panel">
                     <h2>Live Infrastructures</h2>
@@ -248,7 +261,6 @@ def read_root():
                 </div>
             </div>
 
-            <!-- Graph Analytics Tab -->
             <div id="analytics" class="content-section">
                 <div class="glass-card glass-panel">
                     <h2>Network Response Graph</h2>
@@ -258,7 +270,6 @@ def read_root():
                 </div>
             </div>
 
-            <!-- Deploy Tab -->
             <div id="deploy" class="content-section">
                 <div class="glass-card glass-panel" style="max-width: 600px; margin: 0 auto;">
                     <h2>Deploy Monitor Engine</h2>
@@ -271,7 +282,6 @@ def read_root():
                 </div>
             </div>
             
-            <!-- Alerts Tab -->
             <div id="alerts" class="content-section">
                 <div class="glass-card glass-panel" style="max-width: 600px; margin: 0 auto;">
                     <h2>Telegram Notification Setup</h2>
@@ -289,7 +299,6 @@ def read_root():
                 </div>
             </div>
 
-            <!-- Logs Tab -->
             <div id="logs" class="content-section">
                 <div class="glass-card glass-panel">
                     <h2>Live Server Feed</h2>
@@ -333,7 +342,6 @@ def read_root():
                 if(confirm("Stop monitoring this server?")) { await fetch('/del/' + id, { method: 'POST' }); location.reload(); }
             }
             
-            // Chart.js Graph Initialization
             const ctx = document.getElementById('liveChart').getContext('2d');
             let liveChart = new Chart(ctx, {
                 type: 'line',
@@ -341,18 +349,15 @@ def read_root():
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { font: { family: 'Poppins', size: 14 } } } } }
             });
 
-            // Fetch Logs and Graph Data
             setInterval(async () => {
                 let res = await fetch('/data');
                 let data = await res.json();
                 
-                // Update Logs
                 let logsBox = document.getElementById('logs-feed');
                 let isScrolledToBottom = logsBox.scrollHeight - logsBox.clientHeight <= logsBox.scrollTop + 1;
                 logsBox.innerText = data.logs.join('\\n');
                 if (isScrolledToBottom) { logsBox.scrollTop = logsBox.scrollHeight; }
                 
-                // Update Graph
                 liveChart.data.labels = data.graph.labels;
                 liveChart.data.datasets[0].data = data.graph.data;
                 liveChart.update();
@@ -401,7 +406,7 @@ def get_data():
 
 async def pinger():
     while True:
-        await asyncio.sleep(30) # Checks every 30 secs for testing (you can change logic later)
+        await asyncio.sleep(30)
         try:
             conn = sqlite3.connect(DB_NAME)
             cursor = conn.cursor()
@@ -426,7 +431,6 @@ async def pinger():
                         except Exception:
                             log_msg(f"Signal [{label}] CRITICAL: Server Offline!")
                             
-                        # Graph Data (Response Time Simulation for aesthetics if success, 0 if fail)
                         resp_time = int((time.time() - start_time) * 1000) if success else 0
                         graph_data["data"].append(resp_time if success else 0)
                         
@@ -434,7 +438,6 @@ async def pinger():
                         cursor.execute("UPDATE jobs SET total_pings=?, fail_count=? WHERE id=?", (new_total, new_fail, jid))
                         conn.commit()
                         
-                        # Send Telegram Alert on Failure
                         if not success:
                             await send_telegram_alert(f"Server '{label}' ({url}) is NOT responding!")
             conn.close()
