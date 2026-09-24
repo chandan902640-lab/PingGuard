@@ -102,7 +102,7 @@ def read_root():
             .login-glass-box { 
                 background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5)); 
                 border: 2px solid rgba(255,255,255,0.9); border-radius: 35px; 
-                padding: 50px 40px; text-align: center; width: 420px; 
+                padding: 40px 40px; text-align: center; width: 420px; 
                 backdrop-filter: blur(30px); transition: 0.4s;
                 /* Multi-color Animated 3D Shadow */
                 animation: login-neon-pulse 5s infinite;
@@ -118,19 +118,19 @@ def read_root():
             .login-glass-box:hover { transform: translateY(-5px); }
             
             .neon-title { 
-                font-weight: 800; font-size: 38px; margin: 10px 0; color: #0f172a; 
+                font-weight: 800; font-size: 34px; margin: 5px 0; color: #0f172a; 
                 text-shadow: 0 0 15px rgba(0, 242, 254, 0.5), 1px 1px 2px rgba(255,255,255,1); 
                 letter-spacing: 1px; 
             }
-            .login-glass-box p { color: #475569; margin-bottom: 35px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px;}
+            .login-glass-box p { color: #475569; margin-bottom: 25px; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;}
 
             .login-neon-input { 
-                width: 100%; padding: 20px 25px; border-radius: 20px; 
+                width: 100%; padding: 18px 25px; border-radius: 20px; 
                 border: 2px solid rgba(255,255,255,0.9); 
                 background: rgba(225, 235, 245, 0.6); color: #0f172a; 
                 font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 700; text-align: center; 
                 box-shadow: inset 6px 6px 12px rgba(0,0,0,0.06), inset -6px -6px 12px rgba(255,255,255,1); 
-                transition: 0.3s; margin-bottom: 30px; outline: none; 
+                transition: 0.3s; margin-bottom: 25px; outline: none; 
             }
             .login-neon-input::placeholder { color: #94a3b8; font-weight: 500; text-transform: none; letter-spacing: normal; }
             .login-neon-input:focus { 
@@ -226,20 +226,19 @@ def read_root():
         <div class="blob-1"></div>
         <div class="blob-2"></div>
 
-        <!-- NEW UPDATED LOGIN SCREEN -->
+        <!-- NEW UPDATED LOGIN SCREEN WITH ANIME CHARACTER -->
         <div id="login-screen">
             <div class="login-glass-box">
                 
-                <!-- AAPKI UPLOAD KI GAYI GITHUB IMAGE YAHAN HAI -->
-                <div style="margin-bottom: 15px; display: flex; justify-content: center; align-items: center; gap: 15px;">
-                    <span class="dot-blink" style="width: 16px; height: 16px;"></span>
-                    <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Guard Logo" style="height: 60px; filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8));">
+                <!-- ANIME CHARACTER & MULTI-COLOUR BLINKER -->
+                <div style="margin-bottom: 5px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <span class="dot-blink" style="width: 14px; height: 14px;"></span>
+                    <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Anime Guard" style="height: 85px; width: 85px; object-fit: cover; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8));">
                 </div>
                 
                 <h1 class="neon-title">Workspace</h1>
                 <p>Gateway to your servers</p>
                 <div class="input-group" style="margin-bottom: 0;">
-                    <!-- Placeholder changed to "Login Name..." -->
                     <input type="text" id="workspaceInput" class="login-neon-input" placeholder="Login Name..." autocomplete="off" onkeypress="if(event.key === 'Enter') login()">
                 </div>
                 <button class="login-glass-btn" onclick="login()">Enter Dashboard</button>
