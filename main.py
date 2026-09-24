@@ -63,7 +63,7 @@ def read_root():
         
         <style>
             body { 
-                background: #f1f5f9; /* Off-white / light slate base */
+                background: #f1f5f9; 
                 color: #1e293b; 
                 font-family: 'Poppins', sans-serif; 
                 margin: 0; padding: 0; 
@@ -71,22 +71,22 @@ def read_root():
                 position: relative;
             }
             
-            /* Light Pastel Floating Blobs for Glass Blur Effect */
+            /* Light Pastel Floating Blobs */
             .blob-1 {
                 position: absolute; top: -10%; left: -10%; width: 500px; height: 500px;
-                background: #bae6fd; /* Light Blue */ 
+                background: #bae6fd; 
                 border-radius: 50%; filter: blur(80px); opacity: 0.8; z-index: -1;
                 animation: float1 15s infinite alternate ease-in-out;
             }
             .blob-2 {
                 position: absolute; bottom: -20%; right: -10%; width: 600px; height: 600px;
-                background: #e9d5ff; /* Light Purple/Pink */
+                background: #e9d5ff; 
                 border-radius: 50%; filter: blur(100px); opacity: 0.7; z-index: -1;
                 animation: float2 18s infinite alternate ease-in-out;
             }
             .blob-3 {
                 position: absolute; top: 30%; left: 30%; width: 400px; height: 400px;
-                background: #fef08a; /* Light Yellow */
+                background: #fef08a; 
                 border-radius: 50%; filter: blur(90px); opacity: 0.6; z-index: -1;
                 animation: float3 20s infinite alternate ease-in-out;
             }
@@ -104,7 +104,7 @@ def read_root():
                 box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
             }
             
-            /* Left Sidebar */
+            /* Sidebar */
             .sidebar {
                 width: 250px;
                 padding: 30px 20px;
@@ -119,6 +119,33 @@ def read_root():
             }
             .brand span { color: #3b82f6; }
             
+            /* Blinking Pulse Dots */
+            .dot-blink { 
+                width: 10px; height: 10px; border-radius: 50%; 
+                display: inline-block; margin-right: 2px;
+            }
+            
+            .dot-green { background-color: #10b981; animation: pulse-green 2s infinite; }
+            @keyframes pulse-green { 
+                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); } 
+                70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 
+                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
+            }
+            
+            .dot-blue { background-color: #3b82f6; animation: pulse-blue 2s infinite; animation-delay: 0.4s; }
+            @keyframes pulse-blue { 
+                0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6); } 
+                70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); } 
+                100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } 
+            }
+            
+            .dot-purple { background-color: #8b5cf6; animation: pulse-purple 2s infinite; animation-delay: 0.8s; }
+            @keyframes pulse-purple { 
+                0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6); } 
+                70% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); } 
+                100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); } 
+            }
+
             /* Sidebar Buttons */
             .menu-btn {
                 background: rgba(255, 255, 255, 0.4); color: #334155;
@@ -155,9 +182,7 @@ def read_root():
             h2 { font-size: 26px; font-weight: 600; margin-top: 0; margin-bottom: 25px; color: #0f172a; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 15px;}
             
             /* Main Cards */
-            .glass-card {
-                border-radius: 24px; padding: 35px; margin-bottom: 25px;
-            }
+            .glass-card { border-radius: 24px; padding: 35px; margin-bottom: 25px; }
             
             /* Input Fields */
             .input-group { margin-bottom: 20px; }
@@ -190,7 +215,7 @@ def read_root():
                 box-shadow: 0 15px 25px rgba(37, 99, 235, 0.3); 
             }
             
-            /* Individual Server Items */
+            /* Server Items */
             .glass-item {
                 background: rgba(255, 255, 255, 0.6);
                 border: 1px solid rgba(255, 255, 255, 0.9);
@@ -214,7 +239,7 @@ def read_root():
             
             .empty-state { text-align: center; padding: 40px; color: #64748b; font-weight: 500; }
             
-            /* Terminal/Logs */
+            /* Logs */
             .logs-container { 
                 background: rgba(255, 255, 255, 0.7); 
                 border: 1px solid rgba(255, 255, 255, 0.9);
@@ -231,7 +256,6 @@ def read_root():
     </head>
     <body>
         
-        <!-- Faint Animated Pastel Blobs for Glass Effect -->
         <div class="blob-1"></div>
         <div class="blob-2"></div>
         <div class="blob-3"></div>
@@ -239,14 +263,15 @@ def read_root():
         <div class="sidebar glass-panel">
             <div class="brand">Ping<span>Guard</span></div>
             
+            <!-- Removed Emojis, Added Blinking Dots -->
             <button class="menu-btn active" onclick="switchTab('dashboard', this)">
-                🏠 Active Monitors
+                <span class="dot-blink dot-green"></span> Active Monitors
             </button>
             <button class="menu-btn" onclick="switchTab('deploy', this)">
-                🚀 Deploy New
+                <span class="dot-blink dot-blue"></span> Deploy New
             </button>
             <button class="menu-btn" onclick="switchTab('logs', this)">
-                💻 System Terminal
+                <span class="dot-blink dot-purple"></span> System Terminal
             </button>
         </div>
 
