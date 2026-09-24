@@ -232,8 +232,7 @@ def read_root():
             <div class="login-glass-box">
                 
                 <!-- RECTANGULAR OVERFLOWING IMAGE -->
-                <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/1.png" alt="Anime Guard" style="position: absolute; top: -75px; left: 50%; transform: translateX(-50%); height: 110px; width: auto; border-radius: 12px; filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.8));">
-                
+                <img src="https://raw.githubusercontent.com/chandan902640-lab/PingGuard/main/anime.png" alt="Anime Guard" style="position: absolute; top: -75px; left: 50%; transform: translateX(-50%); height: 110px; width: auto; border-radius: 12px; filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.8));">
                 <h1 class="neon-title" style="margin-top: 10px;">Workspace</h1>
                 <p>Gateway to your servers</p>
                 <div class="input-group" style="margin-bottom: 0;">
